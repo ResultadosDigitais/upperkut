@@ -1,13 +1,11 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/upperkut/cli'
-require 'pry'
 
 begin
   cli = Upperkut::CLI.new(ARGV)
   cli.start
 rescue => e
-  raise e
   STDERR.puts e.message
   STDERR.puts e.backtrace.join('\n')
   exit 1
