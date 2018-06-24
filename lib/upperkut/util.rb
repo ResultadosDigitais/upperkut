@@ -12,12 +12,17 @@ module Upperkut
       klass_name
     end
 
-    def decode_json_items(items)
-      items.collect {|i| JSON.parse(i) }
+    def encode_json_items(items)
+      items = items.collect do |i|
+        JSON.generate(
+          'enqueued_at' => Time.now.to_i,
+          'body'        => i
+        )
+      end
     end
 
-    def encode_json_items(items)
-      items.collect {|i| JSON.generate(i) }
+    def decode_json_items(items)
+      items.collect {|i| JSON.parse(i) }
     end
   end
 end

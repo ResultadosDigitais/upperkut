@@ -31,13 +31,14 @@ module Upperkut
       end
     end
 
-
-
     def should_process?
+      buffer_size = @worker.size
+
       return false if @manager.stopped
+      return false if buffer_size == 0
 
       # TODO: rename #setup by config
-      @worker.size >= @worker.setup.batch_size ||
+      buffer_size >= @worker.setup.batch_size ||
         @sleeping_time >= @worker.setup.max_wait
     end
 

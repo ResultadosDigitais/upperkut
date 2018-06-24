@@ -23,8 +23,15 @@ RSpec.describe Upperkut::Worker do
       {'id' => 3, 'name' => 'Mario','role' => 'Tech Leader'}
     ]
 
+
     DummyWorker.push_items(items)
+
     expect(DummyWorker.size).to eq 3
-    expect(DummyWorker.fetch_items).to match_array(items)
+
+    items_saved = DummyWorker.fetch_items.collect do |item|
+      item['body']
+    end
+
+    expect(items_saved).to match_array(items)
   end
 end

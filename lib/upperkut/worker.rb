@@ -11,7 +11,9 @@ module Upperkut
     end
 
     def process
-      items = self.class.fetch_items
+      items = self.class.fetch_items.collect! do |item|
+        item['body']
+      end
       perform(items)
     end
 
@@ -19,7 +21,7 @@ module Upperkut
       extend Forwardable
 
       def_delegators :setup, :strategy
-      def_delegators :strategy, :push_items, :fetch_items, :size
+      def_delegators :strategy, :push_items, :size, :latency
 
       def push_items(items)
         strategy.push_items(items)
