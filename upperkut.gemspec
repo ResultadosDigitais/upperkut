@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "http://shipit.resultadosdigitais.com.br/open-source/"
   spec.license       = "MIT"
 
-  spec.metadata["allowed_push_host"] = "all"
+  #spec.metadata["allowed_push_host"] = "all"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
