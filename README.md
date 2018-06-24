@@ -1,8 +1,6 @@
 # Upperkut
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/upperkut`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Batch background processing tool.
 
 ## Installation
 
@@ -21,8 +19,50 @@ Or install it yourself as:
     $ gem install upperkut
 
 ## Usage
-
-TODO: Write usage instructions here
+Examples:
+                                                                                                        
+1) Create a Worker class and the define how to process the batch;
+  ```ruby                                                                                                      
+  class MyWorker
+    include Upperkut::Worker
+                                                                                                        
+    # This is optional
+                                                                                                        
+    setup_upperkut do |s|
+      # Define which redis instance you want to use
+      s.redis = Redis.new(url: ENV['ANOTHER_REDIS_INSTANCE_URL'])
+                                                                                                        
+      # Define the amount of items must be accumulated
+      s.batch_size = 2_000 # The default value is 1_000
+                                                                                                        
+      # How frequent the Processor should hit redis looking for elegible
+      # batch. The default value is 5. You can also set the env
+      # UPPERKUT_POLLING_INTERVAL.
+      s.polling_interval = 4
+                                                                                                        
+      # How long the Processor should wait to process batch even though
+      # the amount of items did not reached the batch_size.
+      s.max_wait = 300
+    end
+                                                                                                        
+    def perform(batch_items)
+      SidekiqJobA.perform_async(batch_items)
+      SidekiqJobB.perform_async(batch_items)
+                                                                                                        
+      process_metrics(batch_items)
+    end
+  end
+  ```
+                                                                                                        
+2) Start pushings items;
+  ```ruby                                                                                                
+  Myworker.push([{'id' => SecureRandom.uuid}, 'name' => 'Robert C Hall',  'action' => 'EMAIL_OPENNED'])
+  ```
+                                                                                                        
+3) Start Upperkut;
+  ```bash
+  $ bundle exec upperkut --worker MyWorker --concurrency 10
+  ```
 
 ## Development
 
