@@ -61,7 +61,7 @@ module Upperkut
         o.on('-r', '--require FILE', 'Indicate a file to be required') do |arg|
           @options[:file] = arg
         end
-        o.on('-c', '--concurrent INT', 'Numbers of threads to spawn') do |arg|
+        o.on('-c', '--concurrency INT', 'Numbers of threads to spawn') do |arg|
           @options[:concurrency] = Integer(arg)
         end
 
