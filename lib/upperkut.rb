@@ -15,4 +15,6 @@ module Upperkut
       end
     end
   end
+
+  class Shutdown < StandardError ; end
 end

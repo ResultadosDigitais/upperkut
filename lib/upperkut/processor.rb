@@ -7,6 +7,18 @@ module Upperkut
       @sleeping_time = 0
     end
 
+    def run
+      @thread ||= Thread.new do
+        process
+      end
+    end
+    def kill
+      return if !@thread
+      @thread.raise Upperkut::Shutdown
+    end
+
+    private
+
     def process
       loop do
         if should_process?
@@ -15,12 +27,11 @@ module Upperkut
           next
         end
 
-        puts "sleeping for #{@worker.setup.polling_interval} seconds"
         @sleeping_time += sleep(@worker.setup.polling_interval)
       end
     end
 
-    private
+
 
     def should_process?
       return false if @manager.stopped

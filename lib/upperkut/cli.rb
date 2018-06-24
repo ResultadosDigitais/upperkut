@@ -7,6 +7,8 @@ module Upperkut
     def initialize(args = ARGV)
       @options = {}
       parse_options(args)
+
+      STDOUT.puts @options.inspect
     end
 
     def start
@@ -20,12 +22,13 @@ module Upperkut
       signals = %w(INT TERM)
 
       signals.each do |signal|
-        w.puts(signal)
+        trap signal do
+          w.puts(signal)
+        end
       end
 
       begin
         manager.run
-
         while readable_io = IO.select([r])
           signal = readable_io.first[0].gets.strip
           handle_signal(signal)
@@ -33,21 +36,22 @@ module Upperkut
       rescue Interrupt
         puts 'Shutting down'
         manager.stop
+        sleep(5)
+        manager.kill
         exit(0)
       end
     end
 
     private
 
-   def handle_signal(sig)
-      Upperkut.logger.debug "Got #{sig} signal"
+    def handle_signal(sig)
       case sig
       when 'INT'
         raise Interrupt
       when 'TERM'
         raise Interrupt
       end
-   end
+    end
 
     def parse_options(args)
       OptionParser.new do |o|
@@ -56,6 +60,9 @@ module Upperkut
         end
         o.on('-r', '--require FILE', 'Indicate a file to be required') do |arg|
           @options[:file] = arg
+        end
+        o.on('-c', '--concurrent INT', 'Numbers of threads to spawn') do |arg|
+          @options[:concurrency] = Integer(arg)
         end
 
       end.parse!(args)
