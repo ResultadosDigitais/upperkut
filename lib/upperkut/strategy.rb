@@ -12,6 +12,7 @@ module Upperkut
     end
 
     def push_items(items = [])
+      items = [items] if items.is_a?(Hash)
       return false if items.empty?
       redis.lpush(key, encode_json_items(items))
     end
@@ -39,6 +40,10 @@ module Upperkut
       now = Time.now.to_f
       lat = now - item.fetch('enqueued_at', Time.now).to_f
       lat
+    end
+
+    def clear
+      redis.del(key)
     end
 
     private

@@ -13,21 +13,21 @@ require 'redis'
 #
 #     # This is optional
 #
-#     setup_upperkut do |s|
+#     setup_upperkut do |config|
 #       # Define which redis instance you want to use
-#       s.redis = Redis.new(url: ENV['ANOTHER_REDIS_INSTANCE_URL'])
+#       config.redis = Redis.new(url: ENV['ANOTHER_REDIS_INSTANCE_URL'])
 #
 #       # Define the amount of items must be accumulated
-#       s.batch_size = 2_000 # The default value is 1_000
+#       config.batch_size = 2_000 # The default value is 1_000
 #
 #       # How frequent the Processor should hit redis looking for elegible
 #       # batch. The default value is 5 seconds. You can also set the env
 #       # UPPERKUT_POLLING_INTERVAL.
-#       s.polling_interval = 4
+#       config.polling_interval = 4
 #
 #       # How long the Processor should wait in seconds to process batch
 #       # even though the amount of items did not reached the batch_size.
-#       s.max_wait = 300
+#       config.max_wait = 300
 #     end
 #
 #     def perform(batch_items)
@@ -40,7 +40,9 @@ require 'redis'
 #
 # 2) Start pushings items;
 #
-#   Myworker.push([{'id' => SecureRandom.uuid}, 'name' => 'Robert C Hall',  'action' => 'EMAIL_OPENNED'])
+#   Myworker.push_items(
+#     [{'id' => SecureRandom.uuid, 'name' => 'Robert C Hall',  'action' => 'EMAIL_OPENNED'}]
+#   )
 #
 # 3) Start Upperkut;
 #
@@ -49,7 +51,7 @@ require 'redis'
 # 4) That's it :)
 module Upperkut
   class Configuration
-    attr_reader :batch_size, :redis, :strategy, :max_wait, :polling_interval
+    attr_accessor :batch_size, :redis, :strategy, :max_wait, :polling_interval
 
     def self.default
       new.tap do |config|

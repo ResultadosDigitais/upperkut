@@ -16,7 +16,7 @@ RSpec.describe Upperkut::Worker do
     expect(setup.redis).to be_instance_of(Redis)
   end
 
-  it '.push' do
+  it '.push_items' do
     items =  [
       { 'id' => 1, 'name' => 'Jose', 'role' => 'software engineer' },
       { 'id' => 2, 'name' => 'Paulo', 'role' => 'QA engineer' },
