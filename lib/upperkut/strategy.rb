@@ -34,12 +34,11 @@ module Upperkut
     end
 
     def latency
-      item = redis.lrange(key, -1, -1)
+      item = redis.lrange(key, 0, 0)
       item = decode_json_items(item).first
       return 0 unless item
       now = Time.now.to_f
-      lat = now - item.fetch('enqueued_at', Time.now).to_f
-      lat
+      now - item.fetch('enqueued_at', Time.now).to_f
     end
 
     def clear
