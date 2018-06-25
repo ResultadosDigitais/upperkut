@@ -3,7 +3,6 @@ require_relative 'processor'
 
 module Upperkut
   class Manager
-
     attr_accessor :worker, :redis
     attr_reader :stopped
 
@@ -26,9 +25,7 @@ module Upperkut
     end
 
     def kill
-      @processors.each do |processor|
-        processor.kill
-      end
+      @processors.each(&:kill)
     end
   end
 end

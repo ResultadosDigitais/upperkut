@@ -21,12 +21,12 @@ require 'redis'
 #       s.batch_size = 2_000 # The default value is 1_000
 #
 #       # How frequent the Processor should hit redis looking for elegible
-#       # batch. The default value is 5. You can also set the env
+#       # batch. The default value is 5 seconds. You can also set the env
 #       # UPPERKUT_POLLING_INTERVAL.
 #       s.polling_interval = 4
 #
-#       # How long the Processor should wait to process batch even though
-#       # the amount of items did not reached the batch_size.
+#       # How long the Processor should wait in seconds to process batch
+#       # even though the amount of items did not reached the batch_size.
 #       s.max_wait = 300
 #     end
 #
@@ -49,7 +49,7 @@ require 'redis'
 # 4) That's it :)
 module Upperkut
   class Configuration
-    attr_accessor :batch_size, :redis, :strategy, :max_wait, :polling_interval
+    attr_reader :batch_size, :redis, :strategy, :max_wait, :polling_interval
 
     def self.default
       new.tap do |config|
@@ -61,5 +61,6 @@ module Upperkut
     end
   end
 
-  class Shutdown < StandardError ; end
+  # Error class responsible to signal the shutdown process
+  class Shutdown < StandardError; end
 end

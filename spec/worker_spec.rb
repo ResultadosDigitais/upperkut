@@ -18,11 +18,10 @@ RSpec.describe Upperkut::Worker do
 
   it '.push' do
     items =  [
-      {'id' => 1, 'name' =>'Jose', 'role' => 'software engineer'},
-      {'id' => 2, 'name' => 'Paulo', 'role' => 'QA engineer'},
-      {'id' => 3, 'name' => 'Mario','role' => 'Tech Leader'}
+      { 'id' => 1, 'name' => 'Jose', 'role' => 'software engineer' },
+      { 'id' => 2, 'name' => 'Paulo', 'role' => 'QA engineer' },
+      { 'id' => 3, 'name' => 'Mario', 'role' => 'Tech Leader' }
     ]
-
 
     DummyWorker.push_items(items)
 

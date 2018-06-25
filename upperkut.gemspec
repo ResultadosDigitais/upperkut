@@ -1,5 +1,5 @@
 
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'upperkut/version'
 
@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Nando Sousa']
   spec.email         = ['nandosousafr@gmail.com']
 
-  spec.summary       = %q{Batch background processing tool}
-  spec.description   = %q{Batch background processing tool}
+  spec.summary       = 'Batch background processing tool'
+  spec.description   = 'Batch background processing tool'
   spec.homepage      = 'http://shipit.resultadosdigitais.com.br/open-source/'
   spec.license       = 'MIT'
 

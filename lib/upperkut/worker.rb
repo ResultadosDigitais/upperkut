@@ -5,7 +5,6 @@ require_relative '../upperkut'
 
 module Upperkut
   module Worker
-
     def self.included(base)
       base.extend(ClassMethods)
     end
@@ -31,7 +30,7 @@ module Upperkut
         strategy.fetch_items(setup.batch_size)
       end
 
-      def setup_upperkut(&block)
+      def setup_upperkut
         yield(setup) if block_given?
       end
 
