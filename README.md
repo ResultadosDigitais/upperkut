@@ -56,7 +56,7 @@ Examples:
 
 2) Start pushings items;
   ```ruby
-  Myworker.push_items([{'id' => SecureRandom.uuid, 'name' => 'Robert C Hall',  'action' => 'EMAIL_OPENNED']})
+  Myworker.push_items([{'id' => SecureRandom.uuid, 'name' => 'Robert C Hall',  'action' => 'EMAIL_OPENNED'}])
   ```
 
 3) Start Upperkut;
