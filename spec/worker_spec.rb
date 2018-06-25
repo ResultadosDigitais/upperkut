@@ -31,6 +31,6 @@ RSpec.describe Upperkut::Worker do
       item['body']
     end
 
-    expect(items_saved).to match_array(items)
+    expect(items_saved).to eq(items)
   end
 end

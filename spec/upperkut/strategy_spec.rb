@@ -17,16 +17,39 @@ module Upperkut
     describe '.push_items' do
       it 'insert items in the queue' do
         expect do
-          strategy.push_items(['event' => 'open'])
-        end.to change { strategy.size }.from(0).to(1)
+          strategy.push_items([{ 'event' => 'open' }, { 'event' => 'click' }])
+        end.to change { strategy.size }.from(0).to(2)
       end
 
-      context 'when items isnt a array' do
+      it 'insert items in the tail' do
+        strategy.push_items([{ 'event' => 'open' }])
+        strategy.push_items('event' => 'click')
+
+        items = strategy.fetch_items.collect do |item|
+          item['body']
+        end
+
+        expect(items.last).to eq('event' => 'click')
+      end
+
+      context 'when items isn\'t a array' do
         it 'inserts item in the queue' do
           expect do
             strategy.push_items('event' => 'open', 'k' => 1)
           end.to change { strategy.size }.from(0).to(1)
         end
+      end
+    end
+
+    describe '.fetch_items' do
+      it 'returns the head items off queue' do
+        strategy.push_items([{ 'event' => 'open' }, { 'event' => 'click' }])
+
+        items = strategy.fetch_items.collect do |item|
+          item['body']
+        end
+
+        expect(items).to eq([{ 'event' => 'open' }, { 'event' => 'click' }])
       end
     end
 
