@@ -19,7 +19,7 @@ module Upperkut
       manager = Manager.new(@options)
 
       r, w = IO.pipe
-      signals = %w(INT TERM)
+      signals = %w[INT TERM]
 
       signals.each do |signal|
         trap signal do
@@ -64,7 +64,6 @@ module Upperkut
         o.on('-c', '--concurrency INT', 'Numbers of threads to spawn') do |arg|
           @options[:concurrency] = Integer(arg)
         end
-
       end.parse!(args)
     end
   end

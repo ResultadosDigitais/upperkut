@@ -4,9 +4,9 @@ RSpec.describe Upperkut::Worker do
   class DummyWorker
     include Upperkut::Worker
 
-    setup_upperkut do |u|
-      u.batch_size  = 5000
-      u.redis       = Redis.new
+    setup_upperkut do |config|
+      config.batch_size  = 5000
+      config.redis       = Redis.new
     end
   end
 
@@ -16,13 +16,12 @@ RSpec.describe Upperkut::Worker do
     expect(setup.redis).to be_instance_of(Redis)
   end
 
-  it '.push' do
+  it '.push_items' do
     items =  [
-      {'id' => 1, 'name' =>'Jose', 'role' => 'software engineer'},
-      {'id' => 2, 'name' => 'Paulo', 'role' => 'QA engineer'},
-      {'id' => 3, 'name' => 'Mario','role' => 'Tech Leader'}
+      { 'id' => 1, 'name' => 'Jose', 'role' => 'software engineer' },
+      { 'id' => 2, 'name' => 'Paulo', 'role' => 'QA engineer' },
+      { 'id' => 3, 'name' => 'Mario', 'role' => 'Tech Leader' }
     ]
-
 
     DummyWorker.push_items(items)
 
@@ -32,6 +31,20 @@ RSpec.describe Upperkut::Worker do
       item['body']
     end
 
-    expect(items_saved).to match_array(items)
+    expect(items_saved).to eq(items)
+  end
+
+  describe '.clear' do
+    it 'clears the buffer completly' do
+      items =  [
+        { 'id' => 1, 'name' => 'Jose', 'role' => 'software engineer' },
+        { 'id' => 2, 'name' => 'Paulo', 'role' => 'QA engineer' },
+        { 'id' => 3, 'name' => 'Mario', 'role' => 'Tech Leader' }
+      ]
+
+      DummyWorker.push_items(items)
+
+      expect { DummyWorker.clear }.to change { DummyWorker.size }.from(3).to(0)
+    end
   end
 end

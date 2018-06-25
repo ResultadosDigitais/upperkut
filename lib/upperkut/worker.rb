@@ -5,7 +5,6 @@ require_relative '../upperkut'
 
 module Upperkut
   module Worker
-
     def self.included(base)
       base.extend(ClassMethods)
     end
@@ -21,7 +20,7 @@ module Upperkut
       extend Forwardable
 
       def_delegators :setup, :strategy
-      def_delegators :strategy, :push_items, :size, :latency
+      def_delegators :strategy, :push_items, :size, :latency, :clear
 
       def push_items(items)
         strategy.push_items(items)
@@ -31,7 +30,7 @@ module Upperkut
         strategy.fetch_items(setup.batch_size)
       end
 
-      def setup_upperkut(&block)
+      def setup_upperkut
         yield(setup) if block_given?
       end
 

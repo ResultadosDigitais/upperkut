@@ -1,6 +1,5 @@
 module Upperkut
   class Processor
-
     def initialize(manager)
       @manager = manager
       @worker  = @manager.worker
@@ -12,8 +11,9 @@ module Upperkut
         process
       end
     end
+
     def kill
-      return if !@thread
+      return unless @thread
       @thread.raise Upperkut::Shutdown
     end
 
@@ -35,7 +35,7 @@ module Upperkut
       buffer_size = @worker.size
 
       return false if @manager.stopped
-      return false if buffer_size == 0
+      return false if buffer_size.zero?
 
       # TODO: rename #setup by config
       buffer_size >= @worker.setup.batch_size ||
@@ -43,15 +43,13 @@ module Upperkut
     end
 
     def process_batch
-      begin
-        @sleeping_time = 0
-        @worker.new.process
-      rescue Exception => ex
-        # Add to retry_queue
-        # if retry_limit is reached
-        # send to dead
-        raise ex
-      end
+      @sleeping_time = 0
+      @worker.new.process
+    rescue Exception => ex
+      # Add to retry_queue
+      # if retry_limit is reached
+      # send to dead
+      raise ex
     end
   end
 end
