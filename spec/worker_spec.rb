@@ -4,9 +4,9 @@ RSpec.describe Upperkut::Worker do
   class DummyWorker
     include Upperkut::Worker
 
-    setup_upperkut do |u|
-      u.batch_size  = 5000
-      u.redis       = Redis.new
+    setup_upperkut do |config|
+      config.batch_size  = 5000
+      config.redis       = Redis.new
     end
   end
 
