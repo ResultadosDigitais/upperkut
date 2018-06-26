@@ -1,6 +1,8 @@
 # Upperkut
 
 [![CircleCI](https://circleci.com/gh/ResultadosDigitais/upperkut/tree/master.svg?style=svg&circle-token=693e512de6985be3b3db12279ba6ed508fb5c6f6)](https://circleci.com/gh/ResultadosDigitais/upperkut/tree/master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ece40319b0db03af891d/maintainability)](https://codeclimate.com/repos/5b318a7c6d37b70272008676/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/ece40319b0db03af891d/test_coverage)](https://codeclimate.com/repos/5b318a7c6d37b70272008676/test_coverage)
 
 Batch background processing tool.
 
