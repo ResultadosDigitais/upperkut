@@ -1,5 +1,7 @@
 # Upperkut
 
+[![CircleCI](https://circleci.com/gh/ResultadosDigitais/upperkut/tree/master.svg?style=svg&circle-token=693e512de6985be3b3db12279ba6ed508fb5c6f6)](https://circleci.com/gh/ResultadosDigitais/upperkut/tree/master)
+
 Batch background processing tool.
 
 ## Installation
