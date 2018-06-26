@@ -1,7 +1,11 @@
+require 'simplecov'
 require 'bundler/setup'
-require 'upperkut'
 require 'fakeredis'
 require 'pry'
+
+SimpleCov.start if ENV['COVERAGE'] == 'true'
+
+require 'upperkut'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
