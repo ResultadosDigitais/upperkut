@@ -15,13 +15,14 @@ module Upperkut
 
       worker_instance.perform(items.dup)
     rescue Exception => ex
+      @worker.push_items(items)
+
       @logger.info(
         action: :requeue,
         ex: ex,
         item_size: items.size
       )
 
-      @worker.push_items(items)
       raise ex
     end
   end

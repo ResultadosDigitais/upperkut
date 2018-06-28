@@ -20,7 +20,7 @@ module Upperkut
             reason: e
           )
 
-          @manager.notify_killed_process(self)
+          @manager.notify_killed_processor(self)
         end
       end
     end
@@ -28,6 +28,7 @@ module Upperkut
     def kill
       return unless @thread
       @thread.raise Upperkut::Shutdown
+      @thread.value # wait
     end
 
     private
