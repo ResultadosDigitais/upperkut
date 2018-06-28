@@ -9,13 +9,6 @@ module Upperkut
       base.extend(ClassMethods)
     end
 
-    def process
-      items = self.class.fetch_items.collect! do |item|
-        item['body']
-      end
-      perform(items)
-    end
-
     module ClassMethods
       extend Forwardable
 

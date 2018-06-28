@@ -1,9 +1,12 @@
+require_relative 'batch_execution'
+
 module Upperkut
   class Processor
     def initialize(manager)
       @manager = manager
       @worker  = @manager.worker
       @sleeping_time = 0
+      @logger  = Upperkut::Logging.logger
     end
 
     def run
@@ -28,6 +31,7 @@ module Upperkut
         end
 
         @sleeping_time += sleep(@worker.setup.polling_interval)
+        @logger.debug(sleeping_time: @sleeping_time)
       end
     end
 
@@ -43,13 +47,7 @@ module Upperkut
     end
 
     def process_batch
-      @sleeping_time = 0
-      @worker.new.process
-    rescue Exception => ex
-      # Add to retry_queue
-      # if retry_limit is reached
-      # send to dead
-      raise ex
+      BatchExecution.new(@worker, @logger).execute
     end
   end
 end
