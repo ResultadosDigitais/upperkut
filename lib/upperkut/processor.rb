@@ -1,20 +1,34 @@
+require_relative 'batch_execution'
+
 module Upperkut
   class Processor
     def initialize(manager)
       @manager = manager
       @worker  = @manager.worker
+      @logger =  @manager.logger
+
       @sleeping_time = 0
     end
 
     def run
       @thread ||= Thread.new do
-        process
+        begin
+          process
+        rescue Exception => e
+          @logger.debug(
+            action: :processor_killed,
+            reason: e
+          )
+
+          @manager.notify_killed_processor(self)
+        end
       end
     end
 
     def kill
       return unless @thread
       @thread.raise Upperkut::Shutdown
+      @thread.value # wait
     end
 
     private
@@ -28,6 +42,7 @@ module Upperkut
         end
 
         @sleeping_time += sleep(@worker.setup.polling_interval)
+        @logger.debug(sleeping_time: @sleeping_time)
       end
     end
 
@@ -43,13 +58,7 @@ module Upperkut
     end
 
     def process_batch
-      @sleeping_time = 0
-      @worker.new.process
-    rescue Exception => ex
-      # Add to retry_queue
-      # if retry_limit is reached
-      # send to dead
-      raise ex
+      BatchExecution.new(@worker, @logger).execute
     end
   end
 end

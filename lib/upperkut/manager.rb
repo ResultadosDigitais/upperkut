@@ -4,19 +4,23 @@ require_relative 'processor'
 module Upperkut
   class Manager
     attr_accessor :worker, :redis
-    attr_reader :stopped
+    attr_reader :stopped, :logger
 
     def initialize(opts = {})
       self.worker = opts.fetch(:worker).constantize
       self.redis  = worker.setup.redis
       @concurrency = opts.fetch(:concurrency, 25)
+      @logger = opts.fetch(:logger, Upperkut::Logging.logger)
+
       @stopped = false
       @processors = []
     end
 
     def run
       @concurrency.times do
-        @processors << Processor.new(self).run
+        processor = Processor.new(self)
+        @processors << processor
+        processor.run
       end
     end
 
@@ -26,6 +30,15 @@ module Upperkut
 
     def kill
       @processors.each(&:kill)
+    end
+
+    def notify_killed_processor(processor)
+      @processors.delete(processor)
+      return if @stopped
+
+      processor = Processor.new(self)
+      @processors << processor
+      processor.run
     end
   end
 end

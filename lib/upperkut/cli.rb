@@ -21,6 +21,8 @@ module Upperkut
         @logger.level = log_level
       end
 
+      @options[:logger] = @logger
+
       manager = Manager.new(@options)
 
       @logger.info(@options)
@@ -75,7 +77,7 @@ module Upperkut
           @options[:concurrency] = Integer(arg)
         end
         o.on('-l', '--log-level LEVEL', 'Log level') do |arg|
-          @options[:log_level] = arg
+          @options[:log_level] = arg.to_i
         end
       end.parse!(args)
     end
