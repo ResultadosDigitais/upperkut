@@ -77,7 +77,7 @@ module Upperkut
           @options[:concurrency] = Integer(arg)
         end
         o.on('-l', '--log-level LEVEL', 'Log level') do |arg|
-          @options[:log_level] = arg
+          @options[:log_level] = arg.to_i
         end
       end.parse!(args)
     end
