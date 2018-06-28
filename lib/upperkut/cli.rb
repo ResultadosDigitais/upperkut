@@ -1,14 +1,15 @@
 require 'optparse'
 require_relative '../upperkut'
 require_relative 'manager'
+require_relative 'logging'
 
 module Upperkut
   class CLI
     def initialize(args = ARGV)
       @options = {}
-      parse_options(args)
+      @logger = Upperkut::Logging.logger
 
-      STDOUT.puts @options.inspect
+      parse_options(args)
     end
 
     def start
@@ -16,7 +17,13 @@ module Upperkut
         require file
       end
 
+      if log_level = @options[:log_level]
+        @logger.level = log_level
+      end
+
       manager = Manager.new(@options)
+
+      @logger.info(@options)
 
       r, w = IO.pipe
       signals = %w[INT TERM]
@@ -34,7 +41,10 @@ module Upperkut
           handle_signal(signal)
         end
       rescue Interrupt
-        puts 'Shutting down'
+        @logger.info(
+          'Stopping managers, wait for 5 seconds and them kill processors'
+        )
+
         manager.stop
         sleep(5)
         manager.kill
@@ -63,6 +73,9 @@ module Upperkut
         end
         o.on('-c', '--concurrency INT', 'Numbers of threads to spawn') do |arg|
           @options[:concurrency] = Integer(arg)
+        end
+        o.on('-l', '--log-level LEVEL', 'Log level') do |arg|
+          @options[:log_level] = arg
         end
       end.parse!(args)
     end
