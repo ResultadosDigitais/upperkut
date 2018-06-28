@@ -11,7 +11,16 @@ module Upperkut
 
     def run
       @thread ||= Thread.new do
-        process
+        begin
+          process
+        rescue Exception => e
+          @logger.debug(
+            action: :processor_killed,
+            reason: e
+          )
+
+          @manager.notify_killed_process(self)
+        end
       end
     end
 

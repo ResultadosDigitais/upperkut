@@ -16,7 +16,9 @@ module Upperkut
 
     def run
       @concurrency.times do
-        @processors << Processor.new(self).run
+        processor = Processor.new(self)
+        @processors << processor
+        processor.run
       end
     end
 
@@ -26,6 +28,15 @@ module Upperkut
 
     def kill
       @processors.each(&:kill)
+    end
+
+    def notify_killed_processor(processor)
+      @processors.delete(processor)
+      return if @stopped
+
+      processor = Processor.new(self)
+      @processors << processor
+      processor.run
     end
   end
 end
