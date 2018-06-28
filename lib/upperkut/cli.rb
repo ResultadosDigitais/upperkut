@@ -21,6 +21,8 @@ module Upperkut
         @logger.level = log_level
       end
 
+      @options[:logger] = @logger
+
       manager = Manager.new(@options)
 
       @logger.info(@options)

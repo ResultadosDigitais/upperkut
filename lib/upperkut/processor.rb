@@ -5,8 +5,9 @@ module Upperkut
     def initialize(manager)
       @manager = manager
       @worker  = @manager.worker
+      @logger =  @manager.logger
+
       @sleeping_time = 0
-      @logger  = Upperkut::Logging.logger
     end
 
     def run
