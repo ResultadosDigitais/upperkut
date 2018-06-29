@@ -61,6 +61,12 @@ module Upperkut
         config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end
     end
+
+    def middlewares
+      @middlewares ||= Middleware::Chain.new
+      yield @middlewares if block_given?
+      @middlewares
+    end
   end
 
   # Error class responsible to signal the shutdown process

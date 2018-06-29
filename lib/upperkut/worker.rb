@@ -1,5 +1,6 @@
 require 'forwardable'
 require_relative 'strategy'
+require_relative 'middleware'
 require_relative './util'
 require_relative '../upperkut'
 
@@ -12,7 +13,7 @@ module Upperkut
     module ClassMethods
       extend Forwardable
 
-      def_delegators :setup, :strategy
+      def_delegators :setup, :strategy, :middlewares
       def_delegators :strategy, :push_items, :size, :latency, :clear
 
       def push_items(items)
