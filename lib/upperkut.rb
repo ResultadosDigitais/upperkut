@@ -61,6 +61,26 @@ module Upperkut
         config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end
     end
+
+    def middlewares
+      @middlewares ||= init_middleware_chain
+      yield @middlewares if block_given?
+      @middlewares
+    end
+
+    private
+
+    def init_middleware_chain
+      chain = Middleware::Chain.new
+      if defined?(NewRelic::Agent)
+        require_relative 'upperkut/middlewares/new_relic'
+
+        chain.add(Upperkut::Middlewares::NewRelic)
+      end
+
+      chain
+    end
+
   end
 
   # Error class responsible to signal the shutdown process

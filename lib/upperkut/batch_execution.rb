@@ -9,18 +9,23 @@ module Upperkut
 
     def execute
       worker_instance = @worker.new
-      items  = @worker.fetch_items.collect! do |item|
+      items = @worker.fetch_items.freeze
+
+      items_body = items.collect do |item|
         item['body']
       end
 
-      worker_instance.perform(items.dup)
+      @worker.middlewares.invoke(@worker, items) do
+        worker_instance.perform(items_body.dup)
+      end
+
     rescue Exception => ex
-      @worker.push_items(items)
+      @worker.push_items(items_body)
 
       @logger.info(
         action: :requeue,
         ex: ex,
-        item_size: items.size
+        item_size: items_body.size
       )
 
       raise ex
