@@ -22,7 +22,12 @@ module Upperkut
     end
 
     def decode_json_items(items)
-      items.collect { |i| JSON.parse(i) }
+      items.collect! do |i|
+        JSON.parse(i) if i
+      end
+
+      items.compact!
+      items
     end
   end
 end

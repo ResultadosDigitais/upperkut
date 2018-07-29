@@ -1,5 +1,6 @@
 require_relative 'core_ext'
 require_relative 'processor'
+require_relative 'worker'
 
 module Upperkut
   class Manager
