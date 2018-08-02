@@ -13,8 +13,23 @@ module Upperkut
     end
 
     def start
-      if file = @options[:file]
-        require file
+      if target_required = @options[:require]
+        if File.directory?(target_required)
+          require 'rails'
+          if ::Rails::VERSION::MAJOR == 4
+            require File.expand_path("#{@options[:require]}/config/application.rb")
+            ::Rails::Application.initializer "upperkut.eager_load" do
+              ::Rails.application.config.eager_load = true
+            end
+
+            require File.expand_path("#{@options[:require]}/config/environment.rb")
+          else
+            require 'sidekiq/rails'
+            require File.expand_path("#{@options[:require]}/config/environment.rb")
+          end
+        else
+          require file
+        end
       end
 
       if log_level = @options[:log_level]
@@ -71,7 +86,7 @@ module Upperkut
           @options[:worker] = arg
         end
         o.on('-r', '--require FILE', 'Indicate a file to be required') do |arg|
-          @options[:file] = arg
+          @options[:require] = arg
         end
         o.on('-c', '--concurrency INT', 'Numbers of threads to spawn') do |arg|
           @options[:concurrency] = Integer(arg)
