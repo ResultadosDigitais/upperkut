@@ -28,7 +28,7 @@ module Upperkut
             require File.expand_path("#{@options[:require]}/config/environment.rb")
           end
         else
-          require file
+          require target_required
         end
       end
 
