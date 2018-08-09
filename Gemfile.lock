@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    upperkut (0.4.4)
+    upperkut (0.4.5)
       redis (>= 3.3.5, < 5)
 
 GEM
