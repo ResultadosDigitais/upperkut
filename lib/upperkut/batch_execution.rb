@@ -30,6 +30,7 @@ module Upperkut
         item_size: items_body.size
       )
 
+      @logger.error(ex.backtrace.join("\n"))
       raise ex
     end
   end
