@@ -72,10 +72,15 @@ module Upperkut
 
     def init_middleware_chain
       chain = Middleware::Chain.new
+
       if defined?(NewRelic::Agent)
         require_relative 'upperkut/middlewares/new_relic'
-
         chain.add(Upperkut::Middlewares::NewRelic)
+      end
+
+      if defined?(Rollbar::VERSION)
+        require_relative 'upperkut/middlewares/rollbar'
+        chain.add(Upperkut::Middlewares::Rollbar)
       end
 
       chain
