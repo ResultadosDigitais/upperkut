@@ -13,9 +13,9 @@ module Upperkut
 
       def trace_args(worker)
         {
-          'name'       => 'perform',
-          'class_name' => worker.name,
-          'category'   => 'task'
+          name: 'perform',
+          class_name: worker.name,
+          category: 'OtherTransaction/Upperkut'
         }
       end
     end
