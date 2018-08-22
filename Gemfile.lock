@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    upperkut (0.4.5)
-      redis (>= 3.3.5, < 5)
+    upperkut (0.4.6)
+      redis (>= 3.3.3, < 5)
 
 GEM
   remote: https://rubygems.org/
