@@ -29,11 +29,11 @@ module Upperkut
       end
 
       def setup
-        @@setup ||=
+        @config ||=
           begin
-            default = Upperkut::Configuration.default.clone
-            default.strategy ||= Upperkut::Strategy.new(self, default.redis)
-            default
+            config = Upperkut::Configuration.default.clone
+            config.strategy = Upperkut::Strategy.new(self)
+            config
           end
       end
     end

@@ -6,7 +6,7 @@ module Upperkut
 
     attr_accessor :worker, :redis
 
-    def initialize(worker, redis)
+    def initialize(worker, redis = Redis.new)
       self.worker = worker
       self.redis  = redis
     end
