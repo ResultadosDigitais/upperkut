@@ -1,5 +1,10 @@
 # Upperkut changes
 
+0.5.x
+----------
+- Fix thread-unsafe code that was overwriting worker configurations when
+multiples workers were configured in the same process.
+
 0.4.x
 -----------
 
