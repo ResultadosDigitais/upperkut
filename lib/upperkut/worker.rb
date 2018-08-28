@@ -14,7 +14,7 @@ module Upperkut
       extend Forwardable
 
       def_delegators :setup, :strategy, :middlewares
-      def_delegators :strategy, :push_items, :size, :latency, :clear
+      def_delegators :strategy, :push_items, :size, :latency, :clear, :redis
 
       def push_items(items)
         strategy.push_items(items)

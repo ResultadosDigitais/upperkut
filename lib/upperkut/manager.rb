@@ -4,12 +4,11 @@ require_relative 'worker'
 
 module Upperkut
   class Manager
-    attr_accessor :worker, :redis
+    attr_accessor :worker
     attr_reader :stopped, :logger
 
     def initialize(opts = {})
       self.worker = opts.fetch(:worker).constantize
-      self.redis  = worker.setup.redis
       @concurrency = opts.fetch(:concurrency, 25)
       @logger = opts.fetch(:logger, Upperkut::Logging.logger)
 
