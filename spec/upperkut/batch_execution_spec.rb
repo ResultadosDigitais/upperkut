@@ -9,7 +9,9 @@ module Upperkut
       def perform(_items); end
     end
 
-    after do
+    around do |example|
+      DummyWorker.clear
+      example.run
       DummyWorker.clear
     end
 
@@ -17,7 +19,7 @@ module Upperkut
 
     context 'when something goes wrong while processing' do
       it 'requeue_item' do
-        allow_any_instance_of(worker).to receive(:perform).and_raise
+        allow_any_instance_of(worker).to receive(:perform).and_raise(ArgumentError)
 
         item = {'id' => '1', 'event' => 'open'}
         worker.push_items(item)
@@ -25,7 +27,7 @@ module Upperkut
         expect(worker.size).to eq 1
 
         execution = BatchExecution.new(worker)
-        expect { execution.execute }.to raise_error
+        expect { execution.execute }.to raise_error(ArgumentError)
         expect(worker.size).to eq 1
       end
     end
