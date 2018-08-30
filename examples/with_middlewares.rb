@@ -1,4 +1,15 @@
 require_relative '../lib/upperkut/worker'
+require_relative '../lib/upperkut/logging'
+
+class ClientMiddleware
+  def call(worker, items)
+    logger = Upperkut::Logging.logger
+
+    logger.info("inserting worker=#{worker} items=#{items.count}")
+    yield
+    logger.info("inserted worker=#{worker} items=#{items.count}")
+  end
+end
 
 class MyMiddleware
   def call(worker, items)
@@ -14,8 +25,12 @@ class WithMiddlewares
   include Upperkut::Worker
 
   setup_upperkut do |config|
-    config.middlewares do |chain|
+    config.server_middlewares do |chain|
       chain.add MyMiddleware
+    end
+
+    config.client_middlewares do |chain|
+      chain.add ClientMiddleware
     end
   end
 

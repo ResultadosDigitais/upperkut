@@ -13,11 +13,13 @@ module Upperkut
     module ClassMethods
       extend Forwardable
 
-      def_delegators :setup, :strategy, :middlewares
+      def_delegators :setup, :strategy, :server_middlewares, :client_middlewares
       def_delegators :strategy, :push_items, :size, :latency, :clear, :redis
 
       def push_items(items)
-        strategy.push_items(items)
+        client_middlewares.invoke(self, items) do
+          strategy.push_items(items)
+        end
       end
 
       def fetch_items

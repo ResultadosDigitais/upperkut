@@ -14,11 +14,15 @@ RSpec.describe Upperkut::Configuration do
       expect(default.max_wait).to eq 20
       expect(default.polling_interval).to eq 5
 
-      default.middlewares do |chain|
+      default.server_middlewares do |chain|
         chain.add MyMiddleware
       end
 
-      expect(default.middlewares.items).to eq([MyMiddleware])
+      default.client_middlewares do |chain|
+        chain.add MyMiddleware
+      end
+      expect(default.server_middlewares.items).to eq([MyMiddleware])
+      expect(default.client_middlewares.items).to eq([MyMiddleware])
     end
   end
 end

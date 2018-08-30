@@ -17,7 +17,7 @@ module Upperkut
         item['body']
       end
 
-      @worker.middlewares.invoke(@worker, items) do
+      @worker.server_middlewares.invoke(@worker, items) do
         worker_instance.perform(items_body.dup)
       end
 

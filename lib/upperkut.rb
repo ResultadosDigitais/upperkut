@@ -61,10 +61,16 @@ module Upperkut
       end
     end
 
-    def middlewares
-      @middlewares ||= init_middleware_chain
-      yield @middlewares if block_given?
-      @middlewares
+    def server_middlewares
+      @server_middlewares ||= init_middleware_chain
+      yield @server_middlewares if block_given?
+      @server_middlewares
+    end
+
+    def client_middlewares
+      @client_middlewares ||= Middleware::Chain.new
+      yield @client_middlewares if block_given?
+      @client_middlewares
     end
 
     private
