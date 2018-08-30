@@ -3,6 +3,7 @@
 0.5.x
 ----------
 
+- Introducing client middlewares.
 - Fix issue that prevented worker to run.
 - Fix thread-unsafe code that was overwriting worker configurations when
 multiples workers were configured in the same process.
