@@ -9,7 +9,7 @@ module Upperkut
 
     def initialize(opts = {})
       self.worker = opts.fetch(:worker).constantize
-      @concurrency = opts.fetch(:concurrency, 25)
+      @concurrency = opts.fetch(:concurrency, 1)
       @logger = opts.fetch(:logger, Upperkut::Logging.logger)
 
       @stopped = false
