@@ -9,7 +9,7 @@ module Upperkut
       include Upperkut::Worker
     end
 
-    subject(:strategy) { Strategy.new(DummyWorker, Redis.new) }
+    subject(:strategy) { Strategy.new(DummyWorker) }
 
     before do
       strategy.clear
