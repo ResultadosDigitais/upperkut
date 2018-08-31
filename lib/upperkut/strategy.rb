@@ -1,5 +1,5 @@
 require_relative 'util'
-require 'upperkut/redis_pool'
+require_relative 'redis_pool'
 
 module Upperkut
   class Strategy
