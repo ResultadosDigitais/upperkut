@@ -17,12 +17,12 @@ RSpec.describe Upperkut::Worker do
 
         setup_upperkut do |config|
           config.batch_size  = 5000
-          config.strategy =  Upperkut::Strategy.new(self, Redis.new(url: 'redis://remotehost'))
+          config.strategy =  Upperkut::Strategy.new(self, redis: { url: 'redis://remotehost'})
         end
       end
 
-      #expect(DummyWorker.setup.strategy.redis.options[:url]).to eq('redis://localhost')
-      #expect(SecondDummyWorker.setup.strategy.redis.options[:url]).to eq('redis://remotehost')
+      expect(DummyWorker.setup.strategy.options[:redis]).to be_nil
+      expect(SecondDummyWorker.setup.strategy.options[:redis][:url]).to eq('redis://remotehost')
     end
   end
 
