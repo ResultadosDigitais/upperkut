@@ -6,20 +6,11 @@ module Upperkut
     include Upperkut::Util
 
     attr_reader :options
-    attr_accessor :worker, :redis
 
     def initialize(worker, options = {})
       @options    = options
       @redis_pool = RedisPool.new(options.fetch(:redis, {})).create
-
-      self.worker = worker
-    end
-
-    def redis
-      raise ArgumentError, "requires a block" unless block_given?
-      @redis_pool.with do |conn|
-        yield conn
-      end
+      @worker     = worker
     end
 
     def push_items(items = [])
@@ -62,8 +53,15 @@ module Upperkut
 
     private
 
+    def redis
+      raise ArgumentError, "requires a block" unless block_given?
+      @redis_pool.with do |conn|
+        yield conn
+      end
+    end
+
     def key
-      "upperkut:buffers:#{to_underscore(worker.name)}"
+      "upperkut:buffers:#{to_underscore(@worker.name)}"
     end
   end
 end
