@@ -5,11 +5,14 @@ module Upperkut
   class Strategy
     include Upperkut::Util
 
+    attr_reader :options
     attr_accessor :worker, :redis
 
     def initialize(worker, options = {})
+      @options    = options
+      @redis_pool = RedisPool.new(options.fetch(:redis, {})).create
+
       self.worker = worker
-      @redis_pool  = RedisPool.new(options[:redis] || {}).create
     end
 
     def redis

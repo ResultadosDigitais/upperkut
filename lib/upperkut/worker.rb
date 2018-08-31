@@ -14,7 +14,7 @@ module Upperkut
       extend Forwardable
 
       def_delegators :setup, :strategy, :server_middlewares, :client_middlewares
-      def_delegators :strategy, :push_items, :size, :latency, :clear, :redis
+      def_delegators :strategy, :push_items, :size, :latency, :clear
 
       def push_items(items)
         client_middlewares.invoke(self, items) do
