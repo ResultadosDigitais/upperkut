@@ -34,8 +34,7 @@ Examples:
 
     setup_upperkut do |config|
       # Define which redis instance you want to use
-      redis = Redis.new(url: ENV['ANOTHER_REDIS_INSTANCE_URL'])
-      config.strategy = Upperkut::Strategy.new(self, redis)
+      config.strategy = Upperkut::Strategy.new(self, redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL']) })
 
       # Define the amount of items must be accumulated
       config.batch_size = 2_000 # The default value is 1_000
