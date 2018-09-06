@@ -9,7 +9,8 @@ module Upperkut
 
     def initialize(worker, options = {})
       @options    = options
-      @redis_pool = RedisPool.new(options.fetch(:redis, {})).create
+      @redis_options = options.fetch(:redis, {})
+      @redis_pool = setup_redis_pool
       @worker     = worker
     end
 
@@ -52,6 +53,11 @@ module Upperkut
     end
 
     private
+
+    def setup_redis_pool
+      return @redis_options if @redis_options.is_a?(ConnectionPool)
+      RedisPool.new(options.fetch(:redis, {})).create
+    end
 
     def redis
       raise ArgumentError, "requires a block" unless block_given?
