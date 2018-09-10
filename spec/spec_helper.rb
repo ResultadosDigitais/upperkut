@@ -3,6 +3,9 @@ require 'bundler/setup'
 require 'fakeredis'
 require 'pry'
 
+# Set default REDIS_URL environment variable
+ENV['REDIS_URL'] = 'oie'
+
 SimpleCov.start if ENV['COVERAGE'] == 'true'
 
 require 'upperkut'
