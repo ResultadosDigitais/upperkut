@@ -4,7 +4,7 @@ require 'fakeredis'
 require 'pry'
 
 # Set default REDIS_URL environment variable
-ENV['REDIS_URL'] = 'oie'
+ENV['REDIS_URL'] = 'redis://environment.variable'
 
 SimpleCov.start if ENV['COVERAGE'] == 'true'
 
