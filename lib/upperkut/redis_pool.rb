@@ -10,6 +10,7 @@ module Upperkut
       connect_timeout:  0.2,
       read_timeout:     5.0,
       write_timeout:    0.5,
+      url:              ENV['REDIS_URL'],
     }.freeze
 
     def initialize(options)
