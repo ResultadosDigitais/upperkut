@@ -63,7 +63,7 @@ module Upperkut
         )
 
         manager.stop
-        sleep(5)
+        sleep(Integer(ENV['UPPERKUT_TIMEOUT'] || 8))
         manager.kill
         exit(0)
       end
