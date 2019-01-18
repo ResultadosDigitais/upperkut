@@ -24,11 +24,11 @@ module Upperkut
         item = {'id' => '1', 'event' => 'open'}
         worker.push_items(item)
 
-        expect(worker.size).to eq 1
+        expect(worker.metrics['size']).to eq 1
 
         execution = BatchExecution.new(worker)
         expect { execution.execute }.to raise_error(ArgumentError)
-        expect(worker.size).to eq 1
+        expect(worker.metrics['size']).to eq 1
       end
     end
   end

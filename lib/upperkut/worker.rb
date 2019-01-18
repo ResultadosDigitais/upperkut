@@ -1,8 +1,8 @@
 require 'forwardable'
-require_relative 'strategy'
-require_relative 'middleware'
-require_relative './util'
-require_relative '../upperkut'
+require 'upperkut/strategies/queue'
+require 'upperkut/middleware'
+require 'upperkut/util'
+require 'upperkut'
 
 module Upperkut
   module Worker
@@ -14,7 +14,7 @@ module Upperkut
       extend Forwardable
 
       def_delegators :setup, :strategy, :server_middlewares, :client_middlewares
-      def_delegators :strategy, :push_items, :size, :latency, :clear
+      def_delegators :strategy, :metrics, :clear
 
       def push_items(items)
         client_middlewares.invoke(self, items) do
@@ -34,7 +34,7 @@ module Upperkut
         @config ||=
           begin
             config = Upperkut::Configuration.default.clone
-            config.strategy = Upperkut::Strategy.new(self)
+            config.strategy = Upperkut::Strategies::Queue.new(self)
             config
           end
       end

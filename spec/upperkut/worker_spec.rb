@@ -6,7 +6,7 @@ RSpec.describe Upperkut::Worker do
 
     setup_upperkut do |config|
       config.batch_size = 5000
-      config.strategy =  Upperkut::Strategy.new(self)
+      config.strategy =  Upperkut::Strategies::Queue.new(self)
     end
   end
 
@@ -17,7 +17,7 @@ RSpec.describe Upperkut::Worker do
 
         setup_upperkut do |config|
           config.batch_size  = 5000
-          config.strategy =  Upperkut::Strategy.new(self, redis: { url: 'redis://remotehost'})
+          config.strategy =  Upperkut::Strategies::Queue.new(self, redis: { url: 'redis://remotehost'})
         end
       end
 
@@ -29,7 +29,7 @@ RSpec.describe Upperkut::Worker do
   it '.setup_upperkut' do
     setup = DummyWorker.setup
     expect(setup.batch_size).to eq 5000
-    expect(setup.strategy).to be_instance_of(Upperkut::Strategy)
+    expect(setup.strategy).to be_instance_of(Upperkut::Strategies::Queue)
   end
 
   it '.push_items' do
@@ -41,7 +41,7 @@ RSpec.describe Upperkut::Worker do
 
     DummyWorker.push_items(items)
 
-    expect(DummyWorker.size).to eq 3
+    expect(DummyWorker.metrics['size']).to eq 3
 
     items_saved = DummyWorker.fetch_items.collect do |item|
       item['body']
@@ -60,7 +60,7 @@ RSpec.describe Upperkut::Worker do
 
       DummyWorker.push_items(items)
 
-      expect { DummyWorker.clear }.to change { DummyWorker.size }.from(3).to(0)
+      expect { DummyWorker.clear }.to change { DummyWorker.metrics['size'] }.from(3).to(0)
     end
   end
 end
