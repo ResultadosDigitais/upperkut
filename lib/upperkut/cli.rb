@@ -24,7 +24,6 @@ module Upperkut
 
             require File.expand_path("#{@options[:require]}/config/environment.rb")
           else
-            require 'sidekiq/rails'
             require File.expand_path("#{@options[:require]}/config/environment.rb")
           end
         else
