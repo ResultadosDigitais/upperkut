@@ -54,12 +54,10 @@ require 'redis'
 # 4) That's it :)
 module Upperkut
   class Configuration
-    attr_accessor :batch_size, :strategy, :max_wait, :polling_interval
+    attr_accessor :strategy, :polling_interval
 
     def self.default
       new.tap do |config|
-        config.batch_size       = 1_000
-        config.max_wait         = Integer(ENV['UPPERKUT_MAX_WAIT'] || 20)
         config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end
     end

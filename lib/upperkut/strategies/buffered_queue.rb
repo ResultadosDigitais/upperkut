@@ -4,7 +4,7 @@ require 'upperkut/strategies/base'
 
 module Upperkut
   module Strategies
-    class Queue < Upperkut::Strategies::Base
+    class BufferedQueue < Upperkut::Strategies::Base
       include Upperkut::Util
 
       attr_reader :options
@@ -14,6 +14,17 @@ module Upperkut
         @redis_options = options.fetch(:redis, {})
         @redis_pool = setup_redis_pool
         @worker     = worker
+        @max_wait   = options.fetch(
+          :max_wait,
+          Integer(ENV['UPPERKUT_MAX_WAIT'] || 20)
+        )
+
+        @batch_size = options.fetch(
+          :batch_size,
+          Integer(ENV['UPPERKUT_BATCH_SIZE'] || 1000)
+        )
+
+        @waiting_time = 0
       end
 
       def push_items(items = [])
@@ -26,8 +37,8 @@ module Upperkut
         true
       end
 
-      def fetch_items(batch_size = 1000)
-        stop = [batch_size, size].min
+      def fetch_items
+        stop = [@batch_size, size].min
 
         items = redis do |conn|
           conn.multi do
@@ -49,7 +60,24 @@ module Upperkut
         }
       end
 
+      def process?
+        buff_size = size
+
+        if fulfill_condition?(buff_size)
+          @waiting_time = 0
+          return true
+        else
+          @waiting_time += @worker.setup.polling_interval
+          return false
+        end
+      end
+
       private
+
+      def fulfill_condition?(buff_size)
+        return false if buff_size.zero?
+        buff_size >= @batch_size || @waiting_time >= @max_wait
+      end
 
       def size
         redis do |conn|

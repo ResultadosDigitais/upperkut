@@ -1,5 +1,5 @@
 require 'forwardable'
-require 'upperkut/strategies/queue'
+require 'upperkut/strategies/buffered_queue'
 require 'upperkut/middleware'
 require 'upperkut/util'
 require 'upperkut'
@@ -23,7 +23,7 @@ module Upperkut
       end
 
       def fetch_items
-        strategy.fetch_items(setup.batch_size)
+        strategy.fetch_items
       end
 
       def setup_upperkut
@@ -34,7 +34,7 @@ module Upperkut
         @config ||=
           begin
             config = Upperkut::Configuration.default.clone
-            config.strategy = Upperkut::Strategies::Queue.new(self)
+            config.strategy = Upperkut::Strategies::BufferedQueue.new(self)
             config
           end
       end

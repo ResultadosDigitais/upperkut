@@ -3,9 +3,10 @@ require_relative 'batch_execution'
 module Upperkut
   class Processor
     def initialize(manager)
-      @manager = manager
-      @worker  = @manager.worker
-      @logger =  @manager.logger
+      @manager  = manager
+      @worker   = @manager.worker
+      @logger   = @manager.logger
+      @strategy = @worker.strategy
 
       @sleeping_time = 0
     end
@@ -35,7 +36,9 @@ module Upperkut
 
     def process
       loop do
-        if should_process?
+        next if @manager.stopped
+
+        if @strategy.process?
           @sleeping_time = 0
           process_batch
           next
@@ -44,17 +47,6 @@ module Upperkut
         @sleeping_time += sleep(@worker.setup.polling_interval)
         @logger.debug(sleeping_time: @sleeping_time)
       end
-    end
-
-    def should_process?
-      buffer_size = @worker.size
-
-      return false if @manager.stopped
-      return false if buffer_size.zero?
-
-      # TODO: rename #setup by config
-      buffer_size >= @worker.setup.batch_size ||
-        @sleeping_time >= @worker.setup.max_wait
     end
 
     def process_batch

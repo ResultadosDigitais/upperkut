@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'upperkut/strategies/queue'
+require 'upperkut/strategies/buffered_queue'
 require 'time'
 
 module Upperkut
@@ -10,7 +10,7 @@ module Upperkut
         include Upperkut::Worker
       end
 
-      subject(:strategy) { Upperkut::Strategies::Queue.new(DummyWorker) }
+      subject(:strategy) { Upperkut::Strategies::BufferedQueue.new(DummyWorker) }
 
       before do
         strategy.clear
