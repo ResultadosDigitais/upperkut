@@ -34,25 +34,23 @@ Examples:
 
     setup_upperkut do |config|
       # Define which redis instance you want to use
-      config.strategy = Upperkut::Strategy.new(self, redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL']) })
-
-      # Define the amount of items must be accumulated
-      config.batch_size = 2_000 # The default value is 1_000
+      config.strategy = Upperkut::Strategy.new(
+        self,
+        redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL']) },
+        batch_size: 400, # How many events should be dispatched to worker.
+        max_wait: 300    # How long Processor wait in seconds to process batch.
+                         # even though the amount of items did not reached the
+                         # the batch_size.
+      )
 
       # How frequent the Processor should hit redis looking for elegible
       # batch. The default value is 5 seconds. You can also set the env
       # UPPERKUT_POLLING_INTERVAL.
       config.polling_interval = 4
-
-      # How long the Processor should wait in seconds to process batch
-      # even though the amount of items did not reached the batch_size.
-      config.max_wait = 300
     end
 
     def perform(batch_items)
-      SidekiqJobA.perform_async(batch_items)
-      SidekiqJobB.perform_async(batch_items)
-
+      heavy_processing(batch_items)
       process_metrics(batch_items)
     end
   end
