@@ -4,7 +4,7 @@ require 'upperkut/strategies/base'
 
 module Upperkut
   module Strategies
-    class Queue < Upperkut::Strategies::Base
+    class BufferedQueue < Upperkut::Strategies::Base
       include Upperkut::Util
 
       attr_reader :options
