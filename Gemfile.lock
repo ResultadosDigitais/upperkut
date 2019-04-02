@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    upperkut (0.6.0)
+    upperkut (0.7.0)
       connection_pool (~> 2.2, >= 2.2.2)
       redis (>= 3.3.3, < 5)
 
@@ -58,4 +58,4 @@ DEPENDENCIES
   upperkut!
 
 BUNDLED WITH
-   1.16.3
+   1.16.6

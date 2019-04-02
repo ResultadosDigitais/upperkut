@@ -1,5 +1,9 @@
 # Upperkut changes
 
+0.7.x
+---------
+- Extract Buffered Queue behavior to its own strategy #29
+
 0.6.x
 ---------
 - Set redis url when env var REDIS_URL is set thanks to @lucaskds #22
