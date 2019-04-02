@@ -4,7 +4,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/ece40319b0db03af891d/maintainability)](https://codeclimate.com/repos/5b318a7c6d37b70272008676/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/ece40319b0db03af891d/test_coverage)](https://codeclimate.com/repos/5b318a7c6d37b70272008676/test_coverage)
 
-Buffer background processing tool.
+Background processing framework for Ruby applications.
 
 ## Installation
 
