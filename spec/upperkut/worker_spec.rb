@@ -5,7 +5,6 @@ RSpec.describe Upperkut::Worker do
     include Upperkut::Worker
 
     setup_upperkut do |config|
-      config.batch_size = 5000
       config.strategy =  Upperkut::Strategies::Queue.new(self)
     end
   end
@@ -16,7 +15,6 @@ RSpec.describe Upperkut::Worker do
         include Upperkut::Worker
 
         setup_upperkut do |config|
-          config.batch_size  = 5000
           config.strategy =  Upperkut::Strategies::Queue.new(self, redis: { url: 'redis://remotehost'})
         end
       end
@@ -28,7 +26,6 @@ RSpec.describe Upperkut::Worker do
 
   it '.setup_upperkut' do
     setup = DummyWorker.setup
-    expect(setup.batch_size).to eq 5000
     expect(setup.strategy).to be_instance_of(Upperkut::Strategies::Queue)
   end
 
