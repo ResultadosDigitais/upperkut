@@ -34,7 +34,7 @@ Examples:
 
     setup_upperkut do |config|
       # Define which redis instance you want to use
-      config.strategy = Upperkut::Strategy.new(
+      config.strategy = Upperkut::Strategies::BufferedQueue.new(
         self,
         redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL']) },
         batch_size: 400, # How many events should be dispatched to worker.
