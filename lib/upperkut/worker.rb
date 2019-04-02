@@ -23,7 +23,7 @@ module Upperkut
       end
 
       def fetch_items
-        strategy.fetch_items(setup.batch_size)
+        strategy.fetch_items
       end
 
       def setup_upperkut

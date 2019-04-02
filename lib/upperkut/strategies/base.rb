@@ -24,6 +24,13 @@ module Upperkut
         raise NotImplementedError
       end
 
+      # Public: Tells when to execute the event processing,
+      # when this condition is met so the events are dispatched to
+      # the worker.
+      def process?
+        raise NotImplementedError
+      end
+
       # Public: Consolidated strategy metrics.
       #
       # Returns hash containing metric name and values.
