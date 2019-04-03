@@ -7,6 +7,20 @@ module Upperkut
     class ScheduledQueue < Upperkut::Strategies::Base
       include Upperkut::Util
 
+      ZPOPBYRANGE = %(
+        local score_from = ARGV[1]
+        local score_to = ARGV[2]
+        local limit = ARGV[3]
+  
+        local values = redis.call('zrangebyscore', KEYS[1], score_from, score_to, 'LIMIT' , '0' , limit)
+  
+        if table.getn(values) > 0 then
+          redis.call('zrem', KEYS[1], unpack(values))
+        end
+  
+        return values
+      ).freeze
+
       attr_reader :options
 
       def initialize(worker, options = {})
@@ -28,13 +42,14 @@ module Upperkut
       end
 
       def push_items(items = [])
+        #binding.pry
         items = [items] if items.is_a?(Hash)
         return false if items.empty?
 
         redis do |conn|
           items.each do |item|
             item = transform_item(item)
-            conn.zadd(key, item[:timestamp], encode_json_item(item))
+            conn.zadd(key, item['timestamp'], encode_json_item(item))
           end
         end
 
@@ -48,15 +63,7 @@ module Upperkut
         items = []
 
         redis do |conn|
-          conn.multi do
-            job = conn.zrangebyscore(key, '-inf'.freeze, now, :limit => [0, 1]).first
-            while job.present? && current_iteration < stop do
-                if conn.zrem(key, job)
-                  items << job
-                end
-              current_iteration = current_iteration + 1
-            end
-          end
+          items = pop_values('-inf'.freeze, now, stop, conn)
         end
 
         decode_json_items(items)
@@ -87,28 +94,33 @@ module Upperkut
 
       private
 
+      def pop_values(value_from, value_to, limit, redis_client)
+        redis_client.eval(ZPOPBYRANGE, keys: [key], argv: [value_from, value_to, limit])
+      end
+  
       def fulfill_condition?(buff_size)
         return false if buff_size.zero?
         buff_size >= @batch_size || @waiting_time >= @max_wait
       end
 
-      def size
-        now = Time.now.to_f.to_s
-
+      def size(min = '-inf', max = '+inf')
         redis do |conn|
-          conn.ZCOUNT(key, '-inf'.freeze, now)
+          conn.zcount(key, min, max)
         end
       end
 
       def latency
-        now = Time.now.to_f.to_s
+        now = Time.now.to_f
+        job = nil
 
         redis do |conn|
-          job = conn.zrangebyscore(key, '-inf'.freeze, now, :limit => [0, 1]).first
+          job = conn.zrangebyscore(key, '-inf'.freeze, now.to_s, :limit => [0, 1]).first
+          job = decode_json_items([job]).first
+          
         end
         
-        return 0 unless item
-        now - item.fetch(:timestamp, Time.now).to_f
+        return 0 unless job
+        now - job['body'].fetch('timestamp', Time.now).to_f
       end
 
       def setup_redis_pool
@@ -129,7 +141,7 @@ module Upperkut
 
       def transform_item(item)
         attributes = item.clone
-        attributes[:timestamp] = DateTime.now.strftime('%s') unless attributes.key?(:timestamp)
+        attributes['timestamp'] = Time.now.to_i unless attributes.key?('timestamp')
         attributes
       end
 
