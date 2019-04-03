@@ -123,7 +123,7 @@ module Upperkut
 
       # Public: Clear all data related to the strategy.
       def clear
-        redis { |conn| conn.del(key) }
+        redis { |conn| conn.del(queue_key) }
       end
 
       # Public: Tells when to execute the event processing,

@@ -23,7 +23,7 @@ module Upperkut
       end
 
       before do
-        # strategy.clear
+        strategy.clear
       end
 
       describe '.push_items' do
@@ -58,6 +58,16 @@ module Upperkut
             {'tenant_id' => 2, 'some_text' => 'item 2.2'},
             {'tenant_id' => 3, 'some_text' => 'item 3.2'},
           ])
+        end
+      end
+
+      describe '.clear' do
+        it 'deletes the queue' do
+          strategy.push_items(['tenant_id' => 1, 'event' => 'open'])
+
+          expect do
+            strategy.clear
+          end.to change { strategy.metrics['size'] }.from(1).to(0)
         end
       end
     end

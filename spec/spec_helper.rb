@@ -19,7 +19,7 @@ RSpec.configure do |config|
   redis = Redis.new(url: ENV['REDIS_URL'])
   # redis.select(15)
 
-  config.before(:all) { redis.flushdb }
+  config.before(:each) { redis.flushdb }
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
