@@ -12,7 +12,6 @@ module Upperkut
       def initialize(worker, options = {})
         @options = options
         @redis_options = options.fetch(:redis, {})
-        @redis_pool = setup_redis_pool
         @worker     = worker
         @max_wait   = options.fetch(
           :max_wait,
@@ -99,7 +98,7 @@ module Upperkut
       def setup_redis_pool
         return @redis_options if @redis_options.is_a?(ConnectionPool)
 
-        RedisPool.new(options.fetch(:redis, {})).create
+        RedisPool.new(@redis_options).create
       end
 
       def redis
@@ -108,6 +107,13 @@ module Upperkut
         @redis_pool.with do |conn|
           yield conn
         end
+      end
+
+      def redis_pool
+        @redis_pool ||= begin
+                          return @redis_options if @redis_options.is_a?(ConnectionPool)
+                          RedisPool.new(options.fetch(:redis, {})).create
+                        end
       end
 
       def key
