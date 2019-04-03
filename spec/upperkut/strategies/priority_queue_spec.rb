@@ -8,73 +8,56 @@ module Upperkut
       # DummyWorker class to use in tests
       class DummyWorker
         include Upperkut::Worker
+
+        setup_upperkut do |config|
+          config.strategy = strategy
+        end
       end
 
-      subject(:strategy) { described_class.new(DummyWorker) }
+      subject(:strategy) do
+        options = {
+          priority_key: lambda { |item| item['tenant_id'] }
+        }
+
+        described_class.new(DummyWorker, options)
+      end
 
       before do
-        strategy.clear
+        # strategy.clear
       end
 
       describe '.push_items' do
-        it 'insert items in the queue' do
-          expect do
-            strategy.push_items([{ 'event' => 'open' }, { 'event' => 'click' }])
-          end.to change { strategy.metrics['size'] }.from(0).to(2)
-        end
+        # TODO: uma fila não impacta a outra
+        # TODO: clear limpa a fila
 
-        it 'insert items in the tail' do
-          strategy.push_items([{ 'event' => 'open' }])
-          strategy.push_items('event' => 'click')
+        it 'avoids contiguous priority keys' do
+          strategy.push_items([
+            {'tenant_id' => 1, 'some_text' => 'item 1.1'},
+            {'tenant_id' => 1, 'some_text' => 'item 1.2'},
+          ])
 
-          items = strategy.fetch_items.collect do |item|
-            item['body']
-          end
+          strategy.push_items([
+            {'tenant_id' => 2, 'some_text' => 'item 2.1'},
+            {'tenant_id' => 2, 'some_text' => 'item 2.2'},
+          ])
 
-          expect(items.last).to eq('event' => 'click')
-        end
-
-        context 'when items isn\'t a array' do
-          it 'inserts item in the queue' do
-            expect do
-              strategy.push_items('event' => 'open', 'k' => 1)
-            end.to change { strategy.metrics['size'] }.from(0).to(1)
-          end
-        end
-      end
-
-      describe '.fetch_items' do
-        it 'returns the head items off queue' do
-          strategy.push_items([{ 'event' => 'open' }, { 'event' => 'click' }])
+          strategy.push_items([
+            {'tenant_id' => 3, 'some_text' => 'item 3.1'},
+            {'tenant_id' => 3, 'some_text' => 'item 3.2'},
+          ])
 
           items = strategy.fetch_items.collect do |item|
             item['body']
           end
 
-          expect(items).to eq([{ 'event' => 'open' }, { 'event' => 'click' }])
-        end
-      end
-
-      describe '.latency' do
-        it 'returns correct latency' do
-          allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:00'))
-          strategy.push_items('event' => 'open', 'k' => 1)
-
-          allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:04'))
-          strategy.push_items('event' => 'open', 'k' => 1)
-
-          allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:10'))
-
-          expect(strategy.metrics['latency']).to eq 10.0
-        end
-      end
-
-      describe '.clear' do
-        it 'deletes the queue' do
-          strategy.push_items(['event' => 'open'])
-          expect do
-            strategy.clear
-          end.to change { strategy.metrics['size'] }.from(1).to(0)
+          expect(items).to eq([
+            {'tenant_id' => 1, 'some_text' => 'item 1.1'},
+            {'tenant_id' => 2, 'some_text' => 'item 2.1'},
+            {'tenant_id' => 3, 'some_text' => 'item 3.1'},
+            {'tenant_id' => 1, 'some_text' => 'item 1.2'},
+            {'tenant_id' => 2, 'some_text' => 'item 2.2'},
+            {'tenant_id' => 3, 'some_text' => 'item 3.2'},
+          ])
         end
       end
     end
