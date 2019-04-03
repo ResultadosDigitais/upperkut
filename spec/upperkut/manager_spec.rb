@@ -6,8 +6,7 @@ module Upperkut
     class DummyWorker
       include Upperkut::Worker
 
-      def perform(_events)
-      end
+      def perform(_events); end
     end
 
     describe '#initialize' do

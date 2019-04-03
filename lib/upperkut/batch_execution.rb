@@ -20,7 +20,6 @@ module Upperkut
       @worker.server_middlewares.invoke(@worker, items) do
         worker_instance.perform(items_body.dup)
       end
-
     rescue Exception => ex
       @worker.push_items(items_body)
 

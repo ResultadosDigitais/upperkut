@@ -16,7 +16,7 @@ module Upperkut
       items = items.collect do |i|
         JSON.generate(
           'enqueued_at' => Time.now.to_i,
-          'body'        => i
+          'body' => i
         )
       end
     end

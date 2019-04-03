@@ -21,7 +21,7 @@ module Upperkut
       it 'requeue_item' do
         allow_any_instance_of(worker).to receive(:perform).and_raise(ArgumentError)
 
-        item = {'id' => '1', 'event' => 'open'}
+        item = { 'id' => '1', 'event' => 'open' }
         worker.push_items(item)
 
         expect(worker.metrics['size']).to eq 1

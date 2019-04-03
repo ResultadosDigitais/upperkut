@@ -6,7 +6,7 @@ module Upperkut
       # items - The Array of items do be inserted.
       #
       # Returns true when success, raise when error.
-      def push_items(items = [])
+      def push_items(_items = [])
         raise NotImplementedError
       end
 
@@ -15,7 +15,7 @@ module Upperkut
       # batch_size: # of items to be retrieved.
       #
       # Returns an Array containing events as hash.
-      def fetch_items(batch_size)
+      def fetch_items(_batch_size)
         raise NotImplementedError
       end
 
