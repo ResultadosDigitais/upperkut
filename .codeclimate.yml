@@ -1,0 +1,8 @@
+version: "2"
+plugins:
+  brakeman:
+    enabled: false
+  eslint:
+    enabled: false
+  csslint:
+    enabled: false
