@@ -14,13 +14,12 @@ module Upperkut
       def handle_exception(e, worker, items)
         scope = {
           framework: "Upperkut #{::Upperkut::VERSION}",
-          request:   { params: { items_size: items.size } },
-          context:   worker.name
+          request: { params: { items_size: items.size } },
+          context: worker.name
         }
 
-        ::Rollbar.scope(scope).error(e, :use_exception_level_filters => true)
+        ::Rollbar.scope(scope).error(e, use_exception_level_filters: true)
       end
     end
   end
 end
-

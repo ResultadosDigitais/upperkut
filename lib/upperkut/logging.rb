@@ -4,9 +4,8 @@ require 'socket'
 
 module Upperkut
   module Logging
-
     class DefaultFormatter < Logger::Formatter
-      def call(severity, time, program_name, message)
+      def call(severity, time, _program_name, message)
         "upperkut: #{time.utc.iso8601(3)} hostname=#{Socket.gethostname} "\
         "pid=#{::Process.pid} severity=#{severity} #{format_message(message)}\n"
       end
@@ -16,11 +15,10 @@ module Upperkut
       def format_message(message)
         return "msg=#{message} " unless message.is_a?(Hash)
 
-        message.each_with_object('') do |(k,v), memo|
+        message.each_with_object('') do |(k, v), memo|
           memo << "#{k}=#{v}\s"
           memo
         end
-
       end
     end
 

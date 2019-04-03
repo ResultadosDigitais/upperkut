@@ -12,7 +12,7 @@ module Upperkut
           expect(decode_json_items(items)).to eq(
             [
               'id' => 2,
-              'name' =>'value'
+              'name' => 'value'
             ]
           )
         end

@@ -28,6 +28,7 @@ module Upperkut
 
     def kill
       return unless @thread
+
       @thread.raise Upperkut::Shutdown
       @thread.value # wait
     end

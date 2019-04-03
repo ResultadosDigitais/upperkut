@@ -3,14 +3,13 @@ require 'redis'
 
 module Upperkut
   class RedisPool
-
     DEFAULT_OPTIONS = {
-      pool_timeout:     1,    # pool related option
-      size:             2,    # pool related option
-      connect_timeout:  0.2,
-      read_timeout:     5.0,
-      write_timeout:    0.5,
-      url:              ENV['REDIS_URL'],
+      pool_timeout: 1, # pool related option
+      size: 2, # pool related option
+      connect_timeout: 0.2,
+      read_timeout: 5.0,
+      write_timeout: 0.5,
+      url: ENV['REDIS_URL']
     }.freeze
 
     def initialize(options)
@@ -22,7 +21,7 @@ module Upperkut
     end
 
     def create
-      ConnectionPool.new(:timeout => @pool_timeout, :size => @size) do
+      ConnectionPool.new(timeout: @pool_timeout, size: @size) do
         Redis.new(@options)
       end
     end

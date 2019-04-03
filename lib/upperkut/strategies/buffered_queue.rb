@@ -10,7 +10,7 @@ module Upperkut
       attr_reader :options
 
       def initialize(worker, options = {})
-        @options    = options
+        @options = options
         @redis_options = options.fetch(:redis, {})
         @redis_pool = setup_redis_pool
         @worker     = worker
@@ -30,6 +30,7 @@ module Upperkut
       def push_items(items = [])
         items = [items] if items.is_a?(Hash)
         return false if items.empty?
+
         redis do |conn|
           conn.rpush(key, encode_json_items(items))
         end
@@ -56,7 +57,7 @@ module Upperkut
       def metrics
         {
           'latency' => latency,
-          'size'    => size
+          'size' => size
         }
       end
 
@@ -76,6 +77,7 @@ module Upperkut
 
       def fulfill_condition?(buff_size)
         return false if buff_size.zero?
+
         buff_size >= @batch_size || @waiting_time >= @max_wait
       end
 
@@ -89,19 +91,20 @@ module Upperkut
         item = redis { |conn| conn.lrange(key, 0, 0) }
         item = decode_json_items(item).first
         return 0 unless item
+
         now = Time.now.to_f
         now - item.fetch('enqueued_at', Time.now).to_f
       end
 
-
-
       def setup_redis_pool
         return @redis_options if @redis_options.is_a?(ConnectionPool)
+
         RedisPool.new(options.fetch(:redis, {})).create
       end
 
       def redis
-        raise ArgumentError, "requires a block" unless block_given?
+        raise ArgumentError, 'requires a block' unless block_given?
+
         @redis_pool.with do |conn|
           yield conn
         end

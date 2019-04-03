@@ -1,0 +1,15 @@
+version: "2"
+plugins:
+  brakeman:
+    enabled: false
+  eslint:
+    enabled: false
+  csslint:
+    enabled: false
+  rubocop:
+    enabled: true
+    channel: rubocop-0-63
+  reek:
+    enabled: true
+  bundler-audit:
+    enabled: true

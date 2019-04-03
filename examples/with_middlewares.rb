@@ -34,8 +34,8 @@ class WithMiddlewares
     end
   end
 
-  def perform(items)
-    puts "executing........."
+  def perform(_items)
+    puts 'executing.........'
     exec_time = rand(80..200)
     sleep (exec_time.to_f / 1000.to_f)
   end
