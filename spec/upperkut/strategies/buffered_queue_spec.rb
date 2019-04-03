@@ -8,6 +8,10 @@ module Upperkut
       # DummyWorker class to use in tests
       class DummyWorker
         include Upperkut::Worker
+
+        setup_upperkut do |config|
+          config.strategy = strategy
+        end
       end
 
       subject(:strategy) { described_class.new(DummyWorker) }
