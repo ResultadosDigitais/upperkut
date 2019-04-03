@@ -144,7 +144,6 @@ module Upperkut
       # Returns hash containing metric name and values.
       def metrics
         {
-          'latency' => latency,
           'size'    => size
         }
       end
@@ -168,17 +167,6 @@ module Upperkut
         redis do |conn|
           conn.zcard(queue_key)
         end
-      end
-
-      def latency
-=begin
-        item = redis { |conn| conn.lrange(key, 0, 0) }
-        item = decode_json_items(item).first
-        return 0 unless item
-        now = Time.now.to_f
-        now - item.fetch('enqueued_at', Time.now).to_f
-=end
-        0
       end
 
       def redis

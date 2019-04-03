@@ -70,6 +70,21 @@ module Upperkut
           end.to change { strategy.metrics['size'] }.from(1).to(0)
         end
       end
+
+      describe '.metrics' do
+        it 'returns the number of items to be processed' do
+          strategy.push_items([
+            {'tenant_id' => 1, 'some_text' => 'item 1.1'},
+            {'tenant_id' => 1, 'some_text' => 'item 1.2'},
+            {'tenant_id' => 2, 'some_text' => 'item 2.1'},
+            {'tenant_id' => 2, 'some_text' => 'item 2.2'},
+            {'tenant_id' => 3, 'some_text' => 'item 3.1'},
+            {'tenant_id' => 3, 'some_text' => 'item 3.2'},
+          ])
+
+          expect(strategy.metrics['size']).to eq(6)
+        end
+      end
     end
   end
 end
