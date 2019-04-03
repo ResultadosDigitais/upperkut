@@ -67,7 +67,7 @@ module Upperkut
         @priority_key = options.fetch(:priority_key)
         @redis_options = options.fetch(:redis, {})
 
-        @max_wait   = options.fetch(
+        @max_wait = options.fetch(
           :max_wait,
           Integer(ENV['UPPERKUT_MAX_WAIT'] || 20)
         )
@@ -144,7 +144,7 @@ module Upperkut
       # Returns hash containing metric name and values.
       def metrics
         {
-          'size'    => size
+          'size' => size
         }
       end
 
