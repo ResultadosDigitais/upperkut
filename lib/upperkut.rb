@@ -91,7 +91,6 @@ module Upperkut
 
       chain
     end
-
   end
 
   # Error class responsible to signal the shutdown process

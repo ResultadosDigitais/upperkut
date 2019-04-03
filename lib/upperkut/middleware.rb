@@ -9,6 +9,7 @@ module Upperkut
 
       def add(item)
         return @items if @items.include?(item)
+
         @items << item
       end
 

@@ -18,7 +18,7 @@ module Upperkut
           require 'rails'
           if ::Rails::VERSION::MAJOR == 4
             require File.expand_path("#{@options[:require]}/config/application.rb")
-            ::Rails::Application.initializer "upperkut.eager_load" do
+            ::Rails::Application.initializer 'upperkut.eager_load' do
               ::Rails.application.config.eager_load = true
             end
 
