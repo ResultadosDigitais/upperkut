@@ -93,8 +93,6 @@ module Upperkut
         now - item.fetch('enqueued_at', Time.now).to_f
       end
 
-
-
       def setup_redis_pool
         return @redis_options if @redis_options.is_a?(ConnectionPool)
         RedisPool.new(options.fetch(:redis, {})).create

@@ -1,5 +1,6 @@
 require_relative 'upperkut/version'
 require_relative 'upperkut/worker'
+
 require 'redis'
 
 # Public: Upperkut is a batch background processing tool for Ruby.
@@ -78,6 +79,9 @@ module Upperkut
 
     def init_middleware_chain
       chain = Middleware::Chain.new
+
+      require_relative 'upperkut/middlewares/batch'
+      chain.add(Upperkut::Middlewares::Batch)
 
       if defined?(NewRelic::Agent)
         require_relative 'upperkut/middlewares/new_relic'
