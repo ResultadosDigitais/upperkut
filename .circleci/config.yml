@@ -10,6 +10,8 @@ jobs:
         environment:
           CC_TEST_REPORTER_ID: 03ab83a772148a577d29d4acf438d7ebdc95c632224122d0ba8dbb291eedebe6
           COVERAGE: true
+          REDIS_URL: redis://localhost:6379
+      - image: redis:5.0
     steps:
       - checkout
 
