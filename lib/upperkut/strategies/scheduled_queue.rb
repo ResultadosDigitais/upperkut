@@ -25,21 +25,12 @@ module Upperkut
       attr_reader :options
 
       def initialize(worker, options = {})
-        @options       = options
-        @redis_options = options.fetch(:redis, {})
-        @redis_pool    = setup_redis_pool
-        @worker        = worker
-        @max_wait      = options.fetch(
-          :max_wait,
-          Integer(ENV['UPPERKUT_MAX_WAIT'] || 20)
-        )
-
-        @batch_size = options.fetch(
-          :batch_size,
-          Integer(ENV['UPPERKUT_BATCH_SIZE'] || 1000)
-        )
-
+        @options = options
+        initialize_options
+        @redis_pool = setup_redis_pool
+        @worker = worker
         @waiting_time = 0
+        
       end
 
       def push_items(items = [])
@@ -62,7 +53,12 @@ module Upperkut
         items = []
 
         redis do |conn|
-          items = pop_values('-inf'.freeze, now, stop, conn)
+          args = {}
+          args[:value_from] = '-inf'.freeze
+          args[:value_to] = now
+          args[:limit] = stop
+
+          items = pop_values(conn, args)
         end
 
         decode_json_items(items)
@@ -93,7 +89,24 @@ module Upperkut
 
       private
 
-      def pop_values(value_from, value_to, limit, redis_client)
+      def initialize_options
+        @redis_options = @options.fetch(:redis, {})
+        
+        @max_wait = @options.fetch(
+          :max_wait,
+          Integer(ENV['UPPERKUT_MAX_WAIT'] || 20)
+        )
+
+        @batch_size = @options.fetch(
+          :batch_size,
+          Integer(ENV['UPPERKUT_BATCH_SIZE'] || 1000)
+        )
+      end
+
+      def pop_values(redis_client, args)
+        value_from = args[:value_from]
+        value_to = args[:value_to]
+        limit = args[:limit]
         redis_client.eval(ZPOPBYRANGE, keys: [key], argv: [value_from, value_to, limit])
       end
 
@@ -111,16 +124,17 @@ module Upperkut
 
       def latency
         now = Time.now
+        now_timestamp = now.to_f
         job = nil
 
         redis do |conn|
-          job = conn.zrangebyscore(key, '-inf'.freeze, now.to_f.to_s, limit: [0, 1]).first
+          job = conn.zrangebyscore(key, '-inf'.freeze, now_timestamp.to_s, limit: [0, 1]).first
           job = decode_json_items([job]).first
         end
 
         return 0 unless job
 
-        now.to_f - job['body'].fetch('timestamp', now).to_f
+        now_timestamp - job['body'].fetch('timestamp', now).to_f
       end
 
       def setup_redis_pool
