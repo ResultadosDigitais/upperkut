@@ -13,7 +13,7 @@ module Upperkut
         local score_to = ARGV[2]
         local limit = ARGV[3]
 
-        local values = redis.call('zrangebyscore', KEYS[1], score_from, score_to, 'LIMIT' , '0' , limit)
+        local values = redis.call('zrangebyscore', KEYS[1], score_from, score_to, 'LIMIT', '0', limit)
 
         if table.getn(values) > 0 then
           redis.call('zrem', KEYS[1], unpack(values))
