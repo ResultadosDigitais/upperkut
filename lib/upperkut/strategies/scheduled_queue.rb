@@ -30,7 +30,6 @@ module Upperkut
         @redis_pool = setup_redis_pool
         @worker = worker
         @waiting_time = 0
-        
       end
 
       def push_items(items = [])
@@ -48,16 +47,14 @@ module Upperkut
       end
 
       def fetch_items
-        now = Time.now.to_f.to_s
-        stop = [@batch_size, size].min
+        args = {
+          value_from: '-inf'.freeze,
+          value_to: Time.now.to_f.to_s,
+          limit: [@batch_size, size].min,
+        }
         items = []
 
         redis do |conn|
-          args = {}
-          args[:value_from] = '-inf'.freeze
-          args[:value_to] = now
-          args[:limit] = stop
-
           items = pop_values(conn, args)
         end
 
@@ -91,7 +88,7 @@ module Upperkut
 
       def initialize_options
         @redis_options = @options.fetch(:redis, {})
-        
+
         @max_wait = @options.fetch(
           :max_wait,
           Integer(ENV['UPPERKUT_MAX_WAIT'] || 20)
