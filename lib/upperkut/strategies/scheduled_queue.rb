@@ -50,7 +50,7 @@ module Upperkut
         args = {
           value_from: '-inf'.freeze,
           value_to: Time.now.to_f.to_s,
-          limit: [@batch_size, size].min,
+          limit: [@batch_size, size].min
         }
         items = []
 
