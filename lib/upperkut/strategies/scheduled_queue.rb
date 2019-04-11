@@ -2,10 +2,10 @@ require 'upperkut/util'
 require 'upperkut/redis_pool'
 require 'upperkut/strategies/base'
 
-# Public: Encapsulates methods required to build a Scheculed Queue
-# Items are queued, but are only fetched at a specific point in time.
 module Upperkut
   module Strategies
+    # Public: Encapsulates methods required to build a Scheculed Queue
+    # Items are queued, but are only fetched at a specific point in time.
     class ScheduledQueue < Upperkut::Strategies::Base
       include Upperkut::Util
 
