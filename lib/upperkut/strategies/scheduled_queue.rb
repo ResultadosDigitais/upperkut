@@ -2,9 +2,10 @@ require 'upperkut/util'
 require 'upperkut/redis_pool'
 require 'upperkut/strategies/base'
 
+# Public: Encapsulates methods required to build a Scheculed Queue
+# Items are queued, but are only fetched at a specific point in time.
 module Upperkut
   module Strategies
-    # Queue where items are fetched on a specific point in time
     class ScheduledQueue < Upperkut::Strategies::Base
       include Upperkut::Util
 
@@ -50,7 +51,7 @@ module Upperkut
         args = {
           value_from: '-inf'.freeze,
           value_to: Time.now.to_f.to_s,
-          limit: [@batch_size, size].min
+          limit: @batch_size
         }
         items = []
 
@@ -73,7 +74,7 @@ module Upperkut
       end
 
       def process?
-        buff_size = size
+        buff_size = size('-inf', Time.zone.now.to_i)
 
         if fulfill_condition?(buff_size)
           @waiting_time = 0
