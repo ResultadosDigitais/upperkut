@@ -30,7 +30,6 @@ module Upperkut
         initialize_options
         @redis_pool = setup_redis_pool
         @worker = worker
-        @waiting_time = 0
       end
 
       def push_items(items = [])
@@ -76,24 +75,15 @@ module Upperkut
       def process?
         buff_size = size('-inf', Time.zone.now.to_i)
 
-        if fulfill_condition?(buff_size)
-          @waiting_time = 0
-          return true
-        else
-          @waiting_time += @worker.setup.polling_interval
-          return false
-        end
+        return true if fulfill_condition?(buff_size)
+        
+        false
       end
 
       private
 
       def initialize_options
         @redis_options = @options.fetch(:redis, {})
-
-        @max_wait = @options.fetch(
-          :max_wait,
-          Integer(ENV['UPPERKUT_MAX_WAIT'] || 20)
-        )
 
         @batch_size = @options.fetch(
           :batch_size,
@@ -111,7 +101,7 @@ module Upperkut
       def fulfill_condition?(buff_size)
         return false if buff_size.zero?
 
-        buff_size >= @batch_size || @waiting_time >= @max_wait
+        buff_size >= @batch_size
       end
 
       def size(min = '-inf', max = '+inf')
