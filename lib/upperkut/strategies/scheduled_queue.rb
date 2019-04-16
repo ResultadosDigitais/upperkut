@@ -76,7 +76,7 @@ module Upperkut
         buff_size = size('-inf', Time.zone.now.to_i)
 
         return true if fulfill_condition?(buff_size)
-        
+
         false
       end
 
