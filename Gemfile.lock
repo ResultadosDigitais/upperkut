@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    upperkut (0.7.0)
+    upperkut (0.7.1)
       connection_pool (~> 2.2, >= 2.2.2)
       redis (>= 3.3.3, < 5)
 
