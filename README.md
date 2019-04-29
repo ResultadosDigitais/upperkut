@@ -58,7 +58,15 @@ Example 1 - Buffered Queue:
 
 2) Start pushings items;
   ```ruby
-  Myworker.push_items([{'id' => SecureRandom.uuid, 'name' => 'Robert C Hall',  'action' => 'EMAIL_OPENNED'}])
+  Myworker.push_items(
+    [
+      {
+        'id' => SecureRandom.uuid, 
+        'name' => 'Robert C Hall', 
+        'action' => 'EMAIL_OPENNED'
+      }
+    ]
+  )
   ```
 
 3) Start Upperkut;
@@ -94,16 +102,24 @@ Example 2 - Scheduled Queue:
   end
   ```
 
-2) Start pushings items;
+2) Start pushings items with `timestamp` param;
   ```ruby
   # timestamp is 'Thu, 10 May 2019 23:43:58 GMT'
-  Myworker.push_items([{'timestamp' => '1557531838', 'id' => SecureRandom.uuid, 'name' => 'Robert C Hall',  'action' => 'SEND_NOTIFICATION'}])
+  Myworker.push_items(
+    [
+      {
+        'timestamp' => '1557531838', 
+        'id' => SecureRandom.uuid, 
+        'name' => 'Robert C Hall', 
+        'action' => 'SEND_NOTIFICATION'
+      }
+    ]
+  )
   ```
 
 3) Start Upperkut;
   ```bash
   $ bundle exec upperkut --worker MyWorker --concurrency 10
-  # The item will only be fetched (processed) after 'Thu, 10 May 2019 23:43:58 GMT'
   ```
 
 ## Development
