@@ -79,6 +79,7 @@ Or install it yourself as:
 
 1) Create a Worker class and the define how to process the batch;
   ```ruby
+  require 'upperkut/strategies/scheduled_queue'
   class MyWorker
     include Upperkut::Worker
 
