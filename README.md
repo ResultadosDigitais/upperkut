@@ -31,25 +31,6 @@ Or install it yourself as:
   class MyWorker
     include Upperkut::Worker
 
-    # This is optional
-
-    setup_upperkut do |config|
-      # Define which redis instance you want to use
-      config.strategy = Upperkut::Strategies::BufferedQueue.new(
-        self,
-        redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL'] },
-        batch_size: 400, # How many events should be dispatched to worker.
-        max_wait: 300    # How long Processor wait in seconds to process batch.
-                         # even though the amount of items did not reached the
-                         # the batch_size.
-      )
-
-      # How frequent the Processor should hit redis looking for elegible
-      # batch. The default value is 5 seconds. You can also set the env
-      # UPPERKUT_POLLING_INTERVAL.
-      config.polling_interval = 4
-    end
-
     def perform(batch_items)
       heavy_processing(batch_items)
       process_metrics(batch_items)
@@ -57,7 +38,7 @@ Or install it yourself as:
   end
   ```
 
-2) Start pushings items;
+2) Start pushing items;
   ```ruby
   Myworker.push_items(
     [
@@ -94,7 +75,7 @@ Or install it yourself as:
   end
   ```
 
-2) Start pushings items with `timestamp` param;
+2) Start pushing items with `timestamp` parameter;
   ```ruby
   # timestamp is 'Thu, 10 May 2019 23:43:58 GMT'
   Myworker.push_items(
