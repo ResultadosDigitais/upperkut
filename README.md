@@ -84,17 +84,7 @@ Or install it yourself as:
     include Upperkut::Worker
 
     setup_upperkut do |config|
-      # Define which redis instance you want to use
-      config.strategy = Upperkut::Strategies::ScheduledQueue.new(
-        self,
-        redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL'] },
-        batch_size: 400 # How many events should be dispatched to worker.
-      )
-
-      # How frequent the Processor should hit redis looking for elegible
-      # batch. The default value is 5 seconds. You can also set the env
-      # UPPERKUT_POLLING_INTERVAL.
-      config.polling_interval = 4
+      config.strategy = Upperkut::Strategies::ScheduledQueue.new(self)
     end
 
     def perform(batch_items)
