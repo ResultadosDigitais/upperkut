@@ -1,3 +1,4 @@
+require 'time'
 require 'upperkut/util'
 require 'upperkut/redis_pool'
 require 'upperkut/strategies/base'
@@ -74,7 +75,7 @@ module Upperkut
       end
 
       def process?
-        buff_size = size('-inf', Time.zone.now.to_i)
+        buff_size = size('-inf', Time.now.utc.to_i)
 
         if fulfill_condition?(buff_size)
           @waiting_time = 0

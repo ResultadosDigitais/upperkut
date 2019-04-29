@@ -34,7 +34,7 @@ module Upperkut
         @config ||=
           begin
             config = Upperkut::Configuration.default.clone
-            config.strategy = Upperkut::Strategies::BufferedQueue.new(self)
+            config.strategy ||= Upperkut::Strategies::BufferedQueue.new(self)
             config
           end
       end
