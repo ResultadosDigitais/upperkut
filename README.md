@@ -23,7 +23,7 @@ Or install it yourself as:
     $ gem install upperkut
 
 ## Usage
-Examples:
+Example 1 - Buffered Queue:
 
 1) Create a Worker class and the define how to process the batch;
   ```ruby
@@ -36,7 +36,7 @@ Examples:
       # Define which redis instance you want to use
       config.strategy = Upperkut::Strategies::BufferedQueue.new(
         self,
-        redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL']) },
+        redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL'] },
         batch_size: 400, # How many events should be dispatched to worker.
         max_wait: 300    # How long Processor wait in seconds to process batch.
                          # even though the amount of items did not reached the
@@ -64,6 +64,46 @@ Examples:
 3) Start Upperkut;
   ```bash
   $ bundle exec upperkut --worker MyWorker --concurrency 10
+  ```
+
+Example 2 - Scheduled Queue:
+
+1) Create a Worker class and the define how to process the batch;
+  ```ruby
+  class MyWorker
+    include Upperkut::Worker
+
+    setup_upperkut do |config|
+      # Define which redis instance you want to use
+      config.strategy = Upperkut::Strategies::ScheduledQueue.new(
+        self,
+        redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL'] },
+        batch_size: 400 # How many events should be dispatched to worker.
+      )
+
+      # How frequent the Processor should hit redis looking for elegible
+      # batch. The default value is 5 seconds. You can also set the env
+      # UPPERKUT_POLLING_INTERVAL.
+      config.polling_interval = 4
+    end
+
+    def perform(batch_items)
+      heavy_processing(batch_items)
+      process_metrics(batch_items)
+    end
+  end
+  ```
+
+2) Start pushings items;
+  ```ruby
+  # timestamp is 'Thu, 10 May 2019 23:43:58 GMT'
+  Myworker.push_items([{'timestamp' => '1557531838', 'id' => SecureRandom.uuid, 'name' => 'Robert C Hall',  'action' => 'SEND_NOTIFICATION'}])
+  ```
+
+3) Start Upperkut;
+  ```bash
+  $ bundle exec upperkut --worker MyWorker --concurrency 10
+  # The item will only be fetched (processed) after 'Thu, 10 May 2019 23:43:58 GMT'
   ```
 
 ## Development

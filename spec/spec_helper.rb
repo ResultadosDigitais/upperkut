@@ -1,10 +1,10 @@
 require 'simplecov'
 require 'bundler/setup'
-require 'fakeredis'
+require 'redis'
 require 'pry'
 
 # Set default REDIS_URL environment variable
-ENV['REDIS_URL'] = 'redis://environment.variable'
+ENV['REDIS_URL'] = 'redis://localhost'
 
 SimpleCov.start if ENV['COVERAGE'] == 'true'
 

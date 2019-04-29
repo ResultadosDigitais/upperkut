@@ -18,7 +18,8 @@ module Upperkut
         rescue Exception => e
           @logger.debug(
             action: :processor_killed,
-            reason: e
+            reason: e,
+            stacktrace: e.backtrace
           )
 
           @manager.notify_killed_processor(self)
