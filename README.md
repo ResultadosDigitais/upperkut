@@ -80,10 +80,7 @@ Example 2 - Scheduled Queue:
       config.strategy = Upperkut::Strategies::ScheduledQueue.new(
         self,
         redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL']) },
-        batch_size: 400, # How many events should be dispatched to worker.
-        max_wait: 300    # How long Processor wait in seconds to process batch.
-                         # even though the amount of items did not reached the
-                         # the batch_size.
+        batch_size: 400 # How many events should be dispatched to worker.
       )
 
       # How frequent the Processor should hit redis looking for elegible

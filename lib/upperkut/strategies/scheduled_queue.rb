@@ -49,7 +49,7 @@ module Upperkut
       def fetch_items
         args = {
           value_from: '-inf'.freeze,
-          value_to: Time.now.to_f.to_s,
+          value_to: Time.now.utc.to_f.to_s,
           limit: @batch_size
         }
         items = []
@@ -73,7 +73,7 @@ module Upperkut
       end
 
       def process?
-        buff_size = size('-inf', Time.zone.now.to_i)
+        buff_size = size('-inf', Time.now.utc.to_i)
 
         return true if fulfill_condition?(buff_size)
 
@@ -111,7 +111,7 @@ module Upperkut
       end
 
       def latency
-        now = Time.now
+        now = Time.now.utc
         now_timestamp = now.to_f
         job = nil
 
@@ -144,12 +144,12 @@ module Upperkut
       end
 
       def ensure_timestamp_attr(item)
-        item['timestamp'] = Time.now.to_i unless item.key?('timestamp')
+        item['timestamp'] = Time.now.utc.to_i unless item.key?('timestamp')
       end
 
       def encode_json_item(item)
         JSON.generate(
-          'enqueued_at' => Time.now.to_i,
+          'enqueued_at' => Time.now.utc.to_i,
           'body' => item
         )
       end
