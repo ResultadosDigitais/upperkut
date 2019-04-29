@@ -89,6 +89,11 @@ module Upperkut
         chain.add(Upperkut::Middlewares::Rollbar)
       end
 
+      if defined?(Datadog)
+        require_relative 'upperkut/middlewares/datadog'
+        chain.add(Upperkut::Middlewares::Datadog)
+      end
+
       chain
     end
   end
