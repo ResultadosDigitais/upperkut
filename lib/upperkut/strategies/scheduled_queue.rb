@@ -31,7 +31,6 @@ module Upperkut
         initialize_options
         @redis_pool = setup_redis_pool
         @worker = worker
-        @waiting_time = 0
       end
 
       def push_items(items = [])
@@ -51,7 +50,7 @@ module Upperkut
       def fetch_items
         args = {
           value_from: '-inf'.freeze,
-          value_to: Time.now.to_f.to_s,
+          value_to: Time.now.utc.to_f.to_s,
           limit: @batch_size
         }
         items = []
@@ -76,25 +75,15 @@ module Upperkut
 
       def process?
         buff_size = size('-inf', Time.now.utc.to_i)
+        return true if fulfill_condition?(buff_size)
 
-        if fulfill_condition?(buff_size)
-          @waiting_time = 0
-          return true
-        else
-          @waiting_time += @worker.setup.polling_interval
-          return false
-        end
+        false
       end
 
       private
 
       def initialize_options
         @redis_options = @options.fetch(:redis, {})
-
-        @max_wait = @options.fetch(
-          :max_wait,
-          Integer(ENV['UPPERKUT_MAX_WAIT'] || 20)
-        )
 
         @batch_size = @options.fetch(
           :batch_size,
@@ -110,9 +99,7 @@ module Upperkut
       end
 
       def fulfill_condition?(buff_size)
-        return false if buff_size.zero?
-
-        buff_size >= @batch_size || @waiting_time >= @max_wait
+        !buff_size.zero?
       end
 
       def size(min = '-inf', max = '+inf')
@@ -122,7 +109,7 @@ module Upperkut
       end
 
       def latency
-        now = Time.now
+        now = Time.now.utc
         now_timestamp = now.to_f
         job = nil
 
@@ -155,12 +142,12 @@ module Upperkut
       end
 
       def ensure_timestamp_attr(item)
-        item['timestamp'] = Time.now.to_i unless item.key?('timestamp')
+        item['timestamp'] = Time.now.utc.to_i unless item.key?('timestamp')
       end
 
       def encode_json_item(item)
         JSON.generate(
-          'enqueued_at' => Time.now.to_i,
+          'enqueued_at' => Time.now.utc.to_i,
           'body' => item
         )
       end
