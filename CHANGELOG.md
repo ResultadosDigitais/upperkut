@@ -2,13 +2,12 @@
 
 0.7.x
 ---------
+- Added Scheduled Queue Implementation thanks to @rodrigo-araujo #38
 - Added Datahog middleware #42 by @gabriel-augusto
 - Added redis to CI #40 by #henrich-m
 - Specs improvements #34 and #35, #37 by @gabriel-augusto
 - Enable Rubocop #32 by @henrich-m
 - Added codeclimate #31 by @henrich-m
-
-
 - Extract Buffered Queue behavior to its own strategy #29
 
 0.6.x
