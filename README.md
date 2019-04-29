@@ -23,7 +23,8 @@ Or install it yourself as:
     $ gem install upperkut
 
 ## Usage
-Example 1 - Buffered Queue:
+
+### Example 1 - Buffered Queue:
 
 1) Create a Worker class and the define how to process the batch;
   ```ruby
@@ -74,7 +75,7 @@ Example 1 - Buffered Queue:
   $ bundle exec upperkut --worker MyWorker --concurrency 10
   ```
 
-Example 2 - Scheduled Queue:
+### Example 2 - Scheduled Queue:
 
 1) Create a Worker class and the define how to process the batch;
   ```ruby
