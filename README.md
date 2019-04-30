@@ -36,7 +36,7 @@ Examples:
       # Define which redis instance you want to use
       config.strategy = Upperkut::Strategies::BufferedQueue.new(
         self,
-        redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL']) },
+        redis: { url: ENV['ANOTHER_REDIS_INSTANCE_URL'] },
         batch_size: 400, # How many events should be dispatched to worker.
         max_wait: 300    # How long Processor wait in seconds to process batch.
                          # even though the amount of items did not reached the
@@ -58,7 +58,7 @@ Examples:
 
 2) Start pushings items;
   ```ruby
-  Myworker.push_items([{'id' => SecureRandom.uuid, 'name' => 'Robert C Hall',  'action' => 'EMAIL_OPENNED'}])
+  MyWorker.push_items([{'id' => SecureRandom.uuid, 'name' => 'Robert C Hall',  'action' => 'EMAIL_OPENNED'}])
   ```
 
 3) Start Upperkut;
