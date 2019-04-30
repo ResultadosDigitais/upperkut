@@ -53,6 +53,27 @@ require 'redis'
 #
 # 4) That's it :)
 module Upperkut
+  
+  # Upperkut.config do |config| 
+  #   config[:global_server_middlewares].push(String)
+  # end
+
+  class << self 
+    @@config = {
+      global_server_middlewares: [],
+      global_client_middlewares: [],
+    }
+
+    def config
+      yield(global_config) if block_given?
+      @@config.inspect
+    end
+
+    def global_config
+      @@config
+    end
+  end
+
   class Configuration
     attr_accessor :strategy, :polling_interval
 
@@ -65,13 +86,13 @@ module Upperkut
     def server_middlewares
       @server_middlewares ||= init_middleware_chain
       yield @server_middlewares if block_given?
-      @server_middlewares
+      @server_middlewares.merge(@@global_server_middlewares)
     end
 
     def client_middlewares
       @client_middlewares ||= Middleware::Chain.new
       yield @client_middlewares if block_given?
-      @client_middlewares
+      @client_middlewares.merge(@@global_client_middlewares)
     end
 
     private
