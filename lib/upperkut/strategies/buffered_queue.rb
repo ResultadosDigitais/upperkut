@@ -74,6 +74,10 @@ module Upperkut
 
       private
 
+      def key
+        "upperkut:buffers:#{to_underscore(@worker.name)}"
+      end
+
       def fulfill_condition?(buff_size)
         return false if buff_size.zero?
 
@@ -111,10 +115,6 @@ module Upperkut
                             RedisPool.new(@redis_options).create
                           end
                         end
-      end
-
-      def key
-        "upperkut:buffers:#{to_underscore(@worker.name)}"
       end
     end
   end

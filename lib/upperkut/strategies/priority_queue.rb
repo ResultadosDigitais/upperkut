@@ -150,17 +150,17 @@ module Upperkut
 
       private
 
-      def fulfill_condition?(buff_size)
-        return false if buff_size.zero?
-        buff_size >= @batch_size || @waiting_time >= @max_wait
-      end
-
       def queue_checkpoint_key
         "#{queue_key}:checkpoint"
       end
 
       def queue_key
         "upperkut:priority_queue:#{to_underscore(@worker.name)}"
+      end
+
+      def fulfill_condition?(buff_size)
+        return false if buff_size.zero?
+        buff_size >= @batch_size || @waiting_time >= @max_wait
       end
 
       def size
