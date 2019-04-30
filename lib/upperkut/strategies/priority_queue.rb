@@ -22,20 +22,18 @@ module Upperkut
       ENQUEUE_ITEM = %(
         local increment = 1
         local current_checkpoint = tonumber(redis.call("GET", KEYS[1])) or 0
-        local account_score_key = KEYS[2]
-        local current_account_score = tonumber(
-          redis.call("GET", account_score_key)
-        ) or 0
+        local score_key = KEYS[2]
+        local current_score = tonumber(redis.call("GET", score_key)) or 0
         local queue_key = KEYS[3]
         local next_score = nil
 
-        if current_account_score >= current_checkpoint then
-          next_score = current_account_score + increment
+        if current_score >= current_checkpoint then
+          next_score = current_score + increment
         else
           next_score = current_checkpoint + increment
         end
 
-        redis.call("SETEX", account_score_key, 86400, next_score)
+        redis.call("SETEX", score_key, 86400, next_score)
         redis.call("ZADD", queue_key, next_score, ARGV[1])
 
         return next_score
@@ -95,11 +93,11 @@ module Upperkut
 
         redis do |conn|
           items.each do |item|
-            account_key = @priority_key.call(item)
-            account_score_key = "#{queue_key}:#{account_key}:score"
+            priority_key = @priority_key.call(item)
+            score_key = "#{queue_key}:#{priority_key}:score"
 
             keys = [queue_checkpoint_key,
-                    account_score_key,
+                    score_key,
                     queue_key]
 
             conn.eval(ENQUEUE_ITEM,
