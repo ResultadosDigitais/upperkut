@@ -20,7 +20,7 @@ module Upperkut
       @worker.server_middlewares.invoke(@worker, items) do
         worker_instance.perform(items_body.dup)
       end
-    rescue Exception => ex
+    rescue StandardError => ex
       @logger.info(
         action: :requeue,
         ex: ex,
@@ -31,7 +31,7 @@ module Upperkut
 
       if worker_instance.respond_to?(:handle_error)
         worker_instance.handle_error(ex, items_body)
-        return 
+        return
       else
         @worker.push_items(items_body)
       end
