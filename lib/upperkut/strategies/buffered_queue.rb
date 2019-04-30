@@ -95,16 +95,10 @@ module Upperkut
         now - item.fetch('enqueued_at', Time.now).to_f
       end
 
-      def setup_redis_pool
-        return @redis_options if @redis_options.is_a?(ConnectionPool)
-
-        RedisPool.new(@redis_options).create
-      end
-
       def redis
         raise ArgumentError, 'requires a block' unless block_given?
 
-        @redis_pool.with do |conn|
+        redis_pool.with do |conn|
           yield conn
         end
       end
@@ -112,7 +106,7 @@ module Upperkut
       def redis_pool
         @redis_pool ||= begin
                           return @redis_options if @redis_options.is_a?(ConnectionPool)
-                          RedisPool.new(options.fetch(:redis, {})).create
+                          RedisPool.new(@redis_options).create
                         end
       end
 
