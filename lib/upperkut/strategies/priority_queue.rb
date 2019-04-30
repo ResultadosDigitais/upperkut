@@ -18,12 +18,9 @@ module Upperkut
       #  sends few messages to have a fair share of processing time
       ENQUEUE_ITEM = %(
         local increment = 1
-
         local current_checkpoint = tonumber(redis.call("GET", KEYS[1])) or 0
-
         local account_score_key = KEYS[2]
         local current_account_score = tonumber(redis.call("GET", account_score_key)) or 0
-
         local queue_key = KEYS[3]
         local next_score = nil
 
@@ -44,7 +41,6 @@ module Upperkut
         local checkpoint_key = KEYS[1]
         local queue_key = KEYS[2]
         local batch_size = ARGV[1]
-
         local popped_items = redis.call("ZPOPMIN", queue_key, batch_size)
         local items = {}
         local last_score = 0
