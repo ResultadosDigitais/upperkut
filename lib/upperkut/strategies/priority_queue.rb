@@ -4,6 +4,8 @@ module Upperkut
     class PriorityQueue < Upperkut::Strategies::Base
       include Upperkut::Util
 
+      ONE_DAY_IN_SECONDS = 86400
+
       # Logic as follows:
       #
       # We keep the last score used for each tenant key. One tenant_key is
@@ -33,7 +35,7 @@ module Upperkut
           next_score = current_checkpoint + increment
         end
 
-        redis.call("SETEX", score_key, 86400, next_score)
+        redis.call("SETEX", score_key, #{ONE_DAY_IN_SECONDS}, next_score)
         redis.call("ZADD", queue_key, next_score, ARGV[1])
 
         return next_score
