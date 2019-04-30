@@ -8,7 +8,7 @@ module Upperkut
       size: 2, # pool related option
       connect_timeout: 0.2,
       read_timeout: 5.0,
-      write_timeout: 0.5,
+      write_timeout: 0.5
     }.freeze
 
     def initialize(options)
