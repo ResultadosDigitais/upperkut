@@ -27,8 +27,6 @@ module Upperkut
       end
 
       describe '.push_items' do
-        # TODO: uma fila não impacta a outra
-
         it 'avoids contiguous priority keys' do
           strategy.push_items([
             {'tenant_id' => 1, 'some_text' => 'item 1.1'},
