@@ -9,11 +9,11 @@ module Upperkut
       connect_timeout: 0.2,
       read_timeout: 5.0,
       write_timeout: 0.5,
-      url: ENV['REDIS_URL']
     }.freeze
 
     def initialize(options)
-      @options      = DEFAULT_OPTIONS.merge(options)
+      @options      = DEFAULT_OPTIONS.merge(url: ENV['REDIS_URL'])
+                                     .merge(options)
 
       # Extract pool related options
       @size         = @options.delete(:size)
