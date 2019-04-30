@@ -105,8 +105,11 @@ module Upperkut
 
       def redis_pool
         @redis_pool ||= begin
-                          return @redis_options if @redis_options.is_a?(ConnectionPool)
-                          RedisPool.new(@redis_options).create
+                          if @redis_options.is_a?(ConnectionPool)
+                            @redis_options
+                          else
+                            RedisPool.new(@redis_options).create
+                          end
                         end
       end
 
