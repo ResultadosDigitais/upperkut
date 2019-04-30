@@ -6,18 +6,18 @@ module Upperkut
 
       # Logic as follows:
       #
-      # We keep the last score used for each account key. One account_key is
-      #  an account unique id. To calculate the next_score we use
-      #  max(current_account_score, current_global_score) + increment we store
+      # We keep the last score used for each tenant key. One tenant_key is
+      #  an tenant unique id. To calculate the next_score we use
+      #  max(current_tenant_score, current_global_score) + increment we store
       #  the queue in a sorted set using the next_score as ordering key if one
-      #  account sends lots of messages, this account ends up with lots of
-      #  messages in the queue spaced by increment if another account then
-      #  sends a message, since it previous_account_score is lower than the
-      #  first account, it will be inserted before it in the queue.
+      #  tenant sends lots of messages, this tenant ends up with lots of
+      #  messages in the queue spaced by increment if another tenant then
+      #  sends a message, since it previous_tenant_score is lower than the
+      #  first tenant, it will be inserted before it in the queue.
       #
-      # In other words, the idea of this queue is to not allowing an account
+      # In other words, the idea of this queue is to not allowing an tenant
       #  that sends a lot of messages to dominate processing and give a chance
-      #  for accounts that sends few messages to have a fair share of
+      #  for tenants that sends few messages to have a fair share of
       #  processing time.
       ENQUEUE_ITEM = %(
         local increment = 1
