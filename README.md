@@ -45,8 +45,8 @@ Or install it yourself as:
   Myworker.push_items(
     [
       {
-        'id' => SecureRandom.uuid, 
-        'name' => 'Robert C Hall', 
+        'id' => SecureRandom.uuid,
+        'name' => 'Robert C Hall',
         'action' => 'EMAIL_OPENNED'
       }
     ]
@@ -83,14 +83,60 @@ Or install it yourself as:
   Myworker.push_items(
     [
       {
-        'timestamp' => '1557531838', 
-        'id' => SecureRandom.uuid, 
-        'name' => 'Robert C Hall', 
+        'timestamp' => '1557531838',
+        'id' => SecureRandom.uuid,
+        'name' => 'Robert C Hall',
         'action' => 'SEND_NOTIFICATION'
       }
     ]
   )
   ```
+
+3) Start Upperkut;
+  ```bash
+  $ bundle exec upperkut --worker MyWorker --concurrency 10
+  ```
+
+### Example 3 - Priority Queue:
+
+Note: priority queues requires redis 5.0.0+ as it uses ZPOP* commands.
+
+1) Create a Worker class and the define how to process the batch;
+  ```ruby
+  require 'upperkut/strategies/priority_queue'
+
+  class MyWorker
+    include Upperkut::Worker
+
+    setup_upperkut do |config|
+      config.strategy = Upperkut::Strategies::PriorityQueue.new(
+        self,
+        priority_key: -> { |item| item['tenant_id'] }
+      )
+    end
+
+    def perform(items)
+      items.each do |item|
+        puts "event dispatched: #{item.inspect}"
+      end
+    end
+  end
+  ```
+
+2) So you can enqueue items from different tenants;
+  ```ruby
+  MyWorker.push_items(
+    [
+      { 'tenant_id' => 1, 'id' => 1 },
+      { 'tenant_id' => 1, 'id' => 2 },
+      { 'tenant_id' => 1, 'id' => 3 },
+      { 'tenant_id' => 2, 'id' => 4 },
+      { 'tenant_id' => 3, 'id' => 5 },
+    ]
+  )
+  ```
+
+  The code above will enqueue items as follows `1, 4, 5, 2, 3`
 
 3) Start Upperkut;
   ```bash

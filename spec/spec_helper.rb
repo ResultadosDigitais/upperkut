@@ -1,14 +1,13 @@
-require 'simplecov'
 require 'bundler/setup'
+require 'simplecov'
 require 'redis'
 require 'pry'
+require 'upperkut'
 
 # Set default REDIS_URL environment variable
 ENV['REDIS_URL'] = 'redis://localhost'
 
 SimpleCov.start if ENV['COVERAGE'] == 'true'
-
-require 'upperkut'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -16,6 +15,10 @@ RSpec.configure do |config|
 
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
+
+  redis = Redis.new(url: ENV['REDIS_URL'])
+
+  config.before(:each) { redis.flushdb }
 
   config.expect_with :rspec do |c|
     c.syntax = :expect

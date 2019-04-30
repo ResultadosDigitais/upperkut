@@ -12,7 +12,6 @@ module Upperkut
       def initialize(worker, options = {})
         @options = options
         @redis_options = options.fetch(:redis, {})
-        @redis_pool = setup_redis_pool
         @worker     = worker
         @max_wait   = options.fetch(
           :max_wait,
@@ -75,6 +74,10 @@ module Upperkut
 
       private
 
+      def key
+        "upperkut:buffers:#{to_underscore(@worker.name)}"
+      end
+
       def fulfill_condition?(buff_size)
         return false if buff_size.zero?
 
@@ -96,22 +99,22 @@ module Upperkut
         now - item.fetch('enqueued_at', Time.now).to_f
       end
 
-      def setup_redis_pool
-        return @redis_options if @redis_options.is_a?(ConnectionPool)
-
-        RedisPool.new(options.fetch(:redis, {})).create
-      end
-
       def redis
         raise ArgumentError, 'requires a block' unless block_given?
 
-        @redis_pool.with do |conn|
+        redis_pool.with do |conn|
           yield conn
         end
       end
 
-      def key
-        "upperkut:buffers:#{to_underscore(@worker.name)}"
+      def redis_pool
+        @redis_pool ||= begin
+                          if @redis_options.is_a?(ConnectionPool)
+                            @redis_options
+                          else
+                            RedisPool.new(@redis_options).create
+                          end
+                        end
       end
     end
   end
