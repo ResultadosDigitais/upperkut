@@ -1,26 +1,31 @@
 module Upperkut
   module Strategies
+    # Public: Queue that prevent a single tenant from taking over.
     class PriorityQueue < Upperkut::Strategies::Base
       include Upperkut::Util
 
       # Logic as follows:
       #
-      # We keep the last score used for each account key. One account_key is an account unique id.
-      #  to calculate the next_score we use max(current_account_score, current_global_score) + increment
-      #  we store the queue in a sorted set using the next_score as ordering key
-      #  if one account sends lots of messages, this account ends up with lots of
-      #  messages in the queue spaced by increment
-      #  if another account then sends a message, since it previous_account_score is lower than the
-      #  first account, it will be inserted before it in the queue
+      # We keep the last score used for each account key. One account_key is
+      #  an account unique id. To calculate the next_score we use
+      #  max(current_account_score, current_global_score) + increment we store
+      #  the queue in a sorted set using the next_score as ordering key if one
+      #  account sends lots of messages, this account ends up with lots of
+      #  messages in the queue spaced by increment if another account then
+      #  sends a message, since it previous_account_score is lower than the
+      #  first account, it will be inserted before it in the queue.
       #
-      # In other words, the idea of this queue is to not allowing an account that sends a
-      #  lot of messages to dominate processing and give a chance for accounts that
-      #  sends few messages to have a fair share of processing time
+      # In other words, the idea of this queue is to not allowing an account
+      #  that sends a lot of messages to dominate processing and give a chance
+      #  for accounts that sends few messages to have a fair share of
+      #  processing time.
       ENQUEUE_ITEM = %(
         local increment = 1
         local current_checkpoint = tonumber(redis.call("GET", KEYS[1])) or 0
         local account_score_key = KEYS[2]
-        local current_account_score = tonumber(redis.call("GET", account_score_key)) or 0
+        local current_account_score = tonumber(
+          redis.call("GET", account_score_key)
+        ) or 0
         local queue_key = KEYS[3]
         local next_score = nil
 
@@ -93,8 +98,12 @@ module Upperkut
             account_key = @priority_key.call(item)
             account_score_key = "#{queue_key}:#{account_key}:score"
 
+            keys = [queue_checkpoint_key,
+                    account_score_key,
+                    queue_key]
+
             conn.eval(ENQUEUE_ITEM,
-                      keys: [queue_checkpoint_key, account_score_key, queue_key],
+                      keys: keys,
                       argv: [encode_json_items([item])])
           end
         end
@@ -156,6 +165,7 @@ module Upperkut
 
       def fulfill_condition?(buff_size)
         return false if buff_size.zero?
+
         buff_size >= @batch_size || @waiting_time >= @max_wait
       end
 
@@ -167,6 +177,7 @@ module Upperkut
 
       def redis
         raise ArgumentError, 'requires a block' unless block_given?
+
         redis_pool.with do |conn|
           yield conn
         end
