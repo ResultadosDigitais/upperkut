@@ -178,9 +178,12 @@ module Upperkut
 
       def redis_pool
         @redis_pool ||= begin
-                         return @redis_options if @redis_options.is_a?(ConnectionPool)
-                         RedisPool.new(@options.fetch(:redis, {})).create
-                       end
+                          if @redis_options.is_a?(ConnectionPool)
+                            @redis_options
+                          else
+                            RedisPool.new(@options.fetch(:redis, {})).create
+                          end
+                        end
       end
     end
   end
