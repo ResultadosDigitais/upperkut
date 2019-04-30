@@ -97,7 +97,7 @@ Or install it yourself as:
   $ bundle exec upperkut --worker MyWorker --concurrency 10
   ```
 
-### Example 2 - Priority Queue:
+### Example 3 - Priority Queue:
 
 Note: priority queues requires redis 5.0.0+ as it uses ZPOP* commands.
 
