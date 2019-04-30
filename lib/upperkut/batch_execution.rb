@@ -21,8 +21,6 @@ module Upperkut
         worker_instance.perform(items_body.dup)
       end
     rescue Exception => ex
-      @worker.push_items(items_body)
-
       @logger.info(
         action: :requeue,
         ex: ex,
@@ -30,6 +28,14 @@ module Upperkut
       )
 
       @logger.error(ex.backtrace.join("\n"))
+
+      if worker_instance.respond_to?(:handle_error)
+        worker_instance.handle_error(ex, items_body)
+        return 
+      else
+        @worker.push_items(items_body)
+      end
+
       raise ex
     end
   end
