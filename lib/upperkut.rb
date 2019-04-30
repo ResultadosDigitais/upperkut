@@ -1,5 +1,6 @@
 require_relative 'upperkut/version'
 require_relative 'upperkut/worker'
+require_relative 'config/global_configuration'
 require 'redis'
 
 # Public: Upperkut is a batch background processing tool for Ruby.
@@ -55,22 +56,16 @@ require 'redis'
 module Upperkut
   
   # Upperkut.config do |config| 
-  #   config[:global_server_middlewares].push(String)
+  #   config.global_server_middlewares.push(MyServerMiddleware)
+  #   config.global_server_middlewares.push(MyClientMiddleware)
   # end
-
   class << self 
-    @@config = {
-      global_server_middlewares: [],
-      global_client_middlewares: [],
-    }
-
     def config
-      yield(global_config) if block_given?
-      @@config.inspect
+      yield(create_global_config) if block_given?
     end
 
-    def global_config
-      @@config
+    def create_global_config
+      @@global_config = Upperkut::GlobalConfiguration.new
     end
   end
 
@@ -81,18 +76,20 @@ module Upperkut
       new.tap do |config|
         config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end
+
+      @@global_config = Upperkut::GlobalConfiguration.new unless @@global_config.defined?
     end
 
     def server_middlewares
       @server_middlewares ||= init_middleware_chain
       yield @server_middlewares if block_given?
-      @server_middlewares.merge(@@global_server_middlewares)
+      @server_middlewares.merge(@@global_config.global_server_middlewares)
     end
 
     def client_middlewares
       @client_middlewares ||= Middleware::Chain.new
       yield @client_middlewares if block_given?
-      @client_middlewares.merge(@@global_client_middlewares)
+      @client_middlewares.merge(@@global_config.global_client_middlewares)
     end
 
     private

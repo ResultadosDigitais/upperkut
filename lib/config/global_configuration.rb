@@ -1,6 +1,8 @@
 module Upperkut
   class GlobalConfiguration
-    def initialize 
+    attr_accessor :global_server_middlewares, :global_client_middlewares
+    
+    def initialize
       @global_server_middlewares = []
       @global_client_middlewares = []
     end
