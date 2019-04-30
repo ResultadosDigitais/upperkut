@@ -28,7 +28,6 @@ module Upperkut
 
       describe '.push_items' do
         # TODO: uma fila não impacta a outra
-        # TODO: clear limpa a fila
 
         it 'avoids contiguous priority keys' do
           strategy.push_items([
