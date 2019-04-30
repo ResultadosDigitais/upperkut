@@ -45,8 +45,8 @@ Or install it yourself as:
   Myworker.push_items(
     [
       {
-        'id' => SecureRandom.uuid, 
-        'name' => 'Robert C Hall', 
+        'id' => SecureRandom.uuid,
+        'name' => 'Robert C Hall',
         'action' => 'EMAIL_OPENNED'
       }
     ]
@@ -83,9 +83,9 @@ Or install it yourself as:
   Myworker.push_items(
     [
       {
-        'timestamp' => '1557531838', 
-        'id' => SecureRandom.uuid, 
-        'name' => 'Robert C Hall', 
+        'timestamp' => '1557531838',
+        'id' => SecureRandom.uuid,
+        'name' => 'Robert C Hall',
         'action' => 'SEND_NOTIFICATION'
       }
     ]
