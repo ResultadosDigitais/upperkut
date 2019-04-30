@@ -17,7 +17,6 @@ RSpec.configure do |config|
   config.disable_monkey_patching!
 
   redis = Redis.new(url: ENV['REDIS_URL'])
-  # redis.select(15)
 
   config.before(:each) { redis.flushdb }
 
