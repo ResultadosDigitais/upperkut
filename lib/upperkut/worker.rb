@@ -34,6 +34,8 @@ module Upperkut
         @config ||=
           begin
             config = Upperkut::WorkerConfiguration.default.clone
+            puts 'aaaaaa'
+            puts Upperkut::WorkerConfiguration.default.class
             config.strategy ||= Upperkut::Strategies::BufferedQueue.new(self)
             config
           end

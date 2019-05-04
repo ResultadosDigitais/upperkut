@@ -55,15 +55,13 @@ require 'redis'
 # 4) That's it :)
 module Upperkut
   
-  # Upperkut.config do |config| 
+  # Upperkut.configuration do |config| 
   #   config.server_middlewares.push(MyServerMiddleware)
   #   config.server_middlewares.push(MyClientMiddleware)
   # end
-  class << self 
-    def config
-      @config ||= Upperkut::Configuration.new
-      yield(@config) if block_given?
-    end
+  def configuration
+    @configuration ||= Upperkut::Configuration.new
+    yield(@configuration) if block_given?
   end
 
   class WorkerConfiguration
@@ -73,8 +71,6 @@ module Upperkut
       new.tap do |config|
         config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end
-
-      @config = Upperkut::GlobalConfiguration.new unless @config.defined?
     end
 
     def server_middlewares
@@ -110,7 +106,7 @@ module Upperkut
         chain.add(Upperkut::Middlewares::Datadog)
       end
 
-      @config.server_middlewares.each do |middleware|
+      configuration.server_middlewares.each do |middleware|
         chain.add(middleware)
       end
 
@@ -119,8 +115,8 @@ module Upperkut
 
     def init_client_middleware_chain
       chain = Middleware::Chain.new
-
-      @config.client_middlewares.each do |middleware|
+      puts @configuration.class
+      configuration.client_middlewares.each do |middleware|
         chain.add(middleware)
       end
 
