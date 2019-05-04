@@ -74,7 +74,7 @@ module Upperkut
         config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end
 
-      @@global_config = Upperkut::GlobalConfiguration.new unless @@global_config.defined?
+      @config = Upperkut::GlobalConfiguration.new unless @config.defined?
     end
 
     def server_middlewares
