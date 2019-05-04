@@ -1,6 +1,6 @@
 require_relative 'upperkut/version'
 require_relative 'upperkut/worker'
-require_relative 'config/global_configuration'
+require_relative 'config/configuration'
 require 'redis'
 
 # Public: Upperkut is a batch background processing tool for Ruby.
@@ -56,20 +56,17 @@ require 'redis'
 module Upperkut
   
   # Upperkut.config do |config| 
-  #   config.global_server_middlewares.push(MyServerMiddleware)
-  #   config.global_server_middlewares.push(MyClientMiddleware)
+  #   config.server_middlewares.push(MyServerMiddleware)
+  #   config.server_middlewares.push(MyClientMiddleware)
   # end
   class << self 
     def config
-      yield(create_global_config) if block_given?
-    end
-
-    def create_global_config
-      @@global_config = Upperkut::GlobalConfiguration.new
+      @config || = Upperkut::Configuration.new
+      yield(@config) if block_given?
     end
   end
 
-  class Configuration
+  class WorkerConfiguration
     attr_accessor :strategy, :polling_interval
 
     def self.default
@@ -81,35 +78,50 @@ module Upperkut
     end
 
     def server_middlewares
-      @server_middlewares ||= init_middleware_chain
+      @server_middlewares ||= init_server_middleware_chain
       yield @server_middlewares if block_given?
-      @server_middlewares.merge(@@global_config.global_server_middlewares)
     end
 
     def client_middlewares
-      @client_middlewares ||= Middleware::Chain.new
+      @client_middlewares ||= init_client_middleware_chain
       yield @client_middlewares if block_given?
-      @client_middlewares.merge(@@global_config.global_client_middlewares)
     end
 
     private
 
-    def init_middleware_chain
+    def init_server_middleware_chain
       chain = Middleware::Chain.new
 
+      # deprecated
       if defined?(NewRelic::Agent)
         require_relative 'upperkut/middlewares/new_relic'
         chain.add(Upperkut::Middlewares::NewRelic)
       end
 
+      # deprecated
       if defined?(Rollbar::VERSION)
         require_relative 'upperkut/middlewares/rollbar'
         chain.add(Upperkut::Middlewares::Rollbar)
       end
 
+      # deprecated
       if defined?(Datadog)
         require_relative 'upperkut/middlewares/datadog'
         chain.add(Upperkut::Middlewares::Datadog)
+      end
+
+      @config.server_middlewares.each do |middleware|
+        chain.add(middleware)
+      end
+
+      chain
+    end
+
+    def init_client_middleware_chain
+      chain = Middleware::Chain.new
+
+      @config.client_middlewares.each do |middleware|
+        chain.add(middleware)
       end
 
       chain
