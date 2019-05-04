@@ -61,7 +61,7 @@ module Upperkut
   # end
   class << self 
     def config
-      @config || = Upperkut::Configuration.new
+      @config ||= Upperkut::Configuration.new
       yield(@config) if block_given?
     end
   end
