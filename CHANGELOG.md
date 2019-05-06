@@ -2,6 +2,9 @@
 
 0.7.x
 ---------
+- Add handle_error method #44
+- Added Datahog Middleware (#42)
+- Added Priority Queue (#39) thanks to @jeangnc and @jeanmatheussouto
 - Added Scheduled Queue Implementation thanks to @rodrigo-araujo #38
 - Added Datahog middleware #42 by @gabriel-augusto
 - Added redis to CI #40 by #henrich-m
