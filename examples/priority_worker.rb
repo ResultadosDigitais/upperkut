@@ -7,7 +7,7 @@ class PriorityWorker
   setup_upperkut do |config|
     config.strategy = Upperkut::Strategies::PriorityQueue.new(
       self,
-      priority_key: -> { |item| item['tenant_id'] },
+      priority_key: -> (item) { item['tenant_id'] },
       batch_size: 1
     )
   end

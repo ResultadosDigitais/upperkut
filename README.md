@@ -111,7 +111,7 @@ Note: priority queues requires redis 5.0.0+ as it uses ZPOP* commands.
     setup_upperkut do |config|
       config.strategy = Upperkut::Strategies::PriorityQueue.new(
         self,
-        priority_key: -> { |item| item['tenant_id'] }
+        priority_key: -> (item) { item['tenant_id'] }
       )
     end
 
