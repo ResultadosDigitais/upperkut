@@ -59,10 +59,12 @@ module Upperkut
   #   config.server_middlewares.push(MyServerMiddleware)
   #   config.server_middlewares.push(MyClientMiddleware)
   # end
-  def configuration
-    @configuration ||= Upperkut::Configuration.new
-    yield(@configuration) if block_given?
-  end
+  #def self.config
+  #  @configuration ||= Upperkut::Configuration.new
+  #  yield(@configuration) if block_given?
+  #end
+
+  # module_function :configuration
 
   class WorkerConfiguration
     attr_accessor :strategy, :polling_interval
@@ -71,6 +73,7 @@ module Upperkut
       new.tap do |config|
         config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end
+      # @configuration ||= self.config unless @configuration
     end
 
     def server_middlewares
@@ -106,19 +109,20 @@ module Upperkut
         chain.add(Upperkut::Middlewares::Datadog)
       end
 
-      configuration.server_middlewares.each do |middleware|
-        chain.add(middleware)
-      end
+      #@configuration.server_middlewares.each do |middleware|
+      #  chain.add(middleware)
+      #end
 
       chain
     end
 
     def init_client_middleware_chain
       chain = Middleware::Chain.new
-      puts @configuration.class
-      configuration.client_middlewares.each do |middleware|
-        chain.add(middleware)
-      end
+
+      #puts @configuration.class
+      #@configuration.client_middlewares.each do |middleware|
+      #  chain.add(middleware)
+      #end
 
       chain
     end
