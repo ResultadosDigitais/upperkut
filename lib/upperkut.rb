@@ -1,5 +1,6 @@
 require_relative 'upperkut/version'
 require_relative 'upperkut/worker'
+require_relative 'config/configuration'
 require 'redis'
 
 # Public: Upperkut is a batch background processing tool for Ruby.
@@ -53,10 +54,27 @@ require 'redis'
 #
 # 4) That's it :)
 module Upperkut
-  class Configuration
+
+  # Upperkut.config do |config| 
+  #   config.server_middlewares.push(MyServerMiddleware)
+  #   config.server_middlewares.push(MyClientMiddleware)
+  # end
+  class << self
+    attr_accessor :server_configuration
+
+    def config
+      @server_configuration ||= Upperkut::Configuration.new
+      yield(@server_configuration) if block_given?
+    end
+  end
+
+  class WorkerConfiguration
     attr_accessor :strategy, :polling_interval
 
     def self.default
+      Upperkut.config if Upperkut.server_configuration.nil?
+      #puts Upperkut.server_configuration.client_middlewares
+
       new.tap do |config|
         config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end
@@ -69,7 +87,7 @@ module Upperkut
     end
 
     def client_middlewares
-      @client_middlewares ||= Middleware::Chain.new
+      @client_middlewares ||= init_client_middleware_chain
       yield @client_middlewares if block_given?
       @client_middlewares
     end
@@ -92,6 +110,20 @@ module Upperkut
       if defined?(Datadog)
         require_relative 'upperkut/middlewares/datadog'
         chain.add(Upperkut::Middlewares::Datadog)
+      end
+
+      Upperkut.server_configuration.server_middlewares.each do |client_middleware|
+        chain.add(client_middleware)
+      end
+
+      chain
+    end
+
+    def init_client_middleware_chain
+      chain = Middleware::Chain.new
+
+      Upperkut.server_configuration.client_middlewares.each do |client_middleware|
+        chain.add(client_middleware)
       end
 
       chain
