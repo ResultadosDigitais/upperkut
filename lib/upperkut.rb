@@ -78,35 +78,37 @@ module Upperkut
       new.tap do |config|
         config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end
+      # @configuration ||= self.config unless @configuration
     end
 
     def server_middlewares
-      @server_middlewares ||= init_middleware_chain
+      @server_middlewares ||= init_server_middleware_chain
       yield @server_middlewares if block_given?
-      @server_middlewares
     end
 
     def client_middlewares
       @client_middlewares ||= init_client_middleware_chain
       yield @client_middlewares if block_given?
-      @client_middlewares
     end
 
     private
 
-    def init_middleware_chain
+    def init_server_middleware_chain
       chain = Middleware::Chain.new
 
+      # deprecated
       if defined?(NewRelic::Agent)
         require_relative 'upperkut/middlewares/new_relic'
         chain.add(Upperkut::Middlewares::NewRelic)
       end
 
+      # deprecated
       if defined?(Rollbar::VERSION)
         require_relative 'upperkut/middlewares/rollbar'
         chain.add(Upperkut::Middlewares::Rollbar)
       end
 
+      # deprecated
       if defined?(Datadog)
         require_relative 'upperkut/middlewares/datadog'
         chain.add(Upperkut::Middlewares::Datadog)
