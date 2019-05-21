@@ -33,7 +33,7 @@ module Upperkut
       def setup
         @config ||=
           begin
-            config = Upperkut::Configuration.default.clone
+            config = Upperkut::WorkerConfiguration.default.clone
             config.strategy ||= Upperkut::Strategies::BufferedQueue.new(self)
             config
           end

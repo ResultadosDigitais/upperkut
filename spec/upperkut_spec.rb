@@ -1,21 +1,21 @@
 require 'spec_helper'
 require 'upperkut'
 
-RSpec.describe Upperkut::Configuration do
+RSpec.describe Upperkut::WorkerConfiguration do
   class MyMiddleware
     def call(_worker, _items); end
   end
 
   describe '.default' do
     it 'return an upperkut configuration values as default' do
-      default = Upperkut::Configuration.default
+      default = Upperkut::WorkerConfiguration.default
 
       expect(default.polling_interval).to eq 5
     end
   end
 
   describe '#server_middlewares' do
-    let(:config) { Upperkut::Configuration.default }
+    let(:config) { Upperkut::WorkerConfiguration.default }
 
     context 'when block is given' do
       it 'yields the current server middlewares configuration and return it' do
@@ -38,7 +38,7 @@ RSpec.describe Upperkut::Configuration do
   end
 
   describe '#client_middlewares' do
-    let(:config) { Upperkut::Configuration.default }
+    let(:config) { Upperkut::WorkerConfiguration.default }
 
     context 'when block is given' do
       it 'yields the current client middlewares configuration and return it' do
