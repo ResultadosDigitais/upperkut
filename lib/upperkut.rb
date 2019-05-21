@@ -54,7 +54,7 @@ require 'redis'
 #
 # 4) That's it :)
 module Upperkut
-  # Upperkut.config do |config| 
+  # Upperkut.config do |config|
   #   config.server_middlewares.push(MyServerMiddleware)
   #   config.server_middlewares.push(MyClientMiddleware)
   # end
@@ -67,12 +67,13 @@ module Upperkut
     end
   end
 
+  # Defines the configuration of each worker
   class WorkerConfiguration
     attr_accessor :strategy, :polling_interval
 
     def self.default
-      Upperkut.config if Upperkut.server_configuration.nil?
-      
+      Upperkut.config unless Upperkut.server_configuration
+
       new.tap do |config|
         config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end

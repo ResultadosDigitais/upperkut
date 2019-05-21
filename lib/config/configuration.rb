@@ -1,10 +1,10 @@
 module Upperkut
   # Allows global configuration like below:
-  # 
-  # Upperkut.config do |config| 
+  #
+  # Upperkut.config do |config|
   #   config.server_middlewares.push(MyServerMiddleware)
   #   config.server_middlewares.push(MyOtherServerMiddleware)
-  # 
+  #
   #   config.client_middlewares.push(MyClientMiddleware)
   #   config.client_middlewares.push(MyOtherClientMiddleware)
   # end
