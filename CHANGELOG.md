@@ -2,6 +2,7 @@
 
 0.7.x
 ---------
+- Fix logging timeout message #54 by @jeanmatheussouto
 - Add handle_error method #44
 - Added Datahog Middleware (#42)
 - Added Priority Queue (#39) thanks to @jeangnc and @jeanmatheussouto
