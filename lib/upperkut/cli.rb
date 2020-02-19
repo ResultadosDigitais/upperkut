@@ -57,12 +57,13 @@ module Upperkut
           handle_signal(signal)
         end
       rescue Interrupt
+        timeout = Integer(ENV['UPPERKUT_TIMEOUT'] || 8)
         @logger.info(
-          'Stopping managers, wait for 5 seconds and them kill processors'
+          "Stopping managers, wait for #{timeout} seconds and them kill processors"
         )
 
         manager.stop
-        sleep(Integer(ENV['UPPERKUT_TIMEOUT'] || 8))
+        sleep(timeout)
         manager.kill
         exit(0)
       end
