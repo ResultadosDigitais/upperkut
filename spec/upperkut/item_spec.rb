@@ -23,6 +23,22 @@ module Upperkut
       end
     end
 
+    describe '#body' do
+      subject(:body) { item.body }
+
+      it { is_expected.to eq({ my_property: 1 }) }
+
+      it 'returns a copy' do
+        expect { body[:my_another_property] = 1 }.not_to change { item.body }
+      end
+    end
+
+    describe '#enqueued_at' do
+      subject { item.enqueued_at }
+
+      it { is_expected.to eq(current_timestamp) }
+    end
+
     describe '#to_json' do
       subject { item.to_json }
 

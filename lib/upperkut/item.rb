@@ -1,6 +1,6 @@
 module Upperkut
   class Item
-    attr_reader :body, :enqueued_at
+    attr_reader :enqueued_at
 
     def initialize(body, enqueued_at = nil)
       raise ArgumentError, 'Body should be a Hash' unless body.is_a?(Hash)
@@ -19,6 +19,10 @@ module Upperkut
 
     def key?(key)
       @body.key?(key)
+    end
+
+    def body
+      @body.dup
     end
 
     def to_json
