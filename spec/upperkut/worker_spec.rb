@@ -40,9 +40,7 @@ RSpec.describe Upperkut::Worker do
 
     expect(DummyWorker.metrics['size']).to eq 3
 
-    items_saved = DummyWorker.fetch_items.collect do |item|
-      item['body']
-    end
+    items_saved = DummyWorker.fetch_items.map(&:body)
 
     expect(items_saved).to eq(items)
   end
