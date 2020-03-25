@@ -1,4 +1,3 @@
-require 'upperkut/item'
 require 'upperkut/util'
 require 'upperkut/redis_pool'
 require 'upperkut/strategies/base'
