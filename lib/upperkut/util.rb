@@ -17,7 +17,7 @@ module Upperkut
       items = [items] if items.is_a?(Hash)
 
       items.map do |item|
-        next item if items.is_a?(Item)
+        next item if item.is_a?(Item)
         Item.new(item)
       end
     end
