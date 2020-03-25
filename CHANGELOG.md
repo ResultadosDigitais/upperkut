@@ -1,4 +1,8 @@
 # Upperkut changes
+0.8.x
+--------
+- Introducing Item to avoid losing enqueued at and report wrong latency
+  metrics, thanks to @jeangnc
 
 0.7.x
 ---------
