@@ -14,7 +14,7 @@ module Upperkut
       items = @worker.fetch_items.freeze
 
       @worker.server_middlewares.invoke(@worker, items) do
-        items_body = items.map { |item| item.body }
+        items_body = items.map(&:body)
         worker_instance.perform(items_body)
       end
     rescue StandardError => error
