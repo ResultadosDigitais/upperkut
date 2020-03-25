@@ -18,6 +18,7 @@ module Upperkut
 
       items.map do |item|
         next item if item.is_a?(Item)
+
         Item.new(item)
       end
     end

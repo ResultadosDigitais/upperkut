@@ -24,7 +24,7 @@ module Upperkut
     def to_json
       JSON.generate(
         'body' => @body,
-        'enqueued_at' => @enqueued_at,
+        'enqueued_at' => @enqueued_at
       )
     end
 
@@ -34,4 +34,3 @@ module Upperkut
     end
   end
 end
-
