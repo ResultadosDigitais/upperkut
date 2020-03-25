@@ -12,9 +12,10 @@ module Upperkut
     def execute
       worker_instance = @worker.new
       items = @worker.fetch_items
+      items_body = items.map { |item| item.body }
 
       @worker.server_middlewares.invoke(@worker, items) do
-        worker_instance.perform(items)
+        worker_instance.perform(items_body)
       end
     rescue StandardError => error
       @logger.info(
