@@ -27,15 +27,15 @@ module Upperkut
 
     let(:worker) { DummyWorker }
     let(:smarter_worker) { SmarterWorker }
-    
+
     context 'when something goes wrong while processing' do
       context 'when client implements handle_error method' do
-        it 'calls .handle_error method' do 
+        it 'calls .handle_error method' do
           allow_any_instance_of(smarter_worker).to receive(:perform).and_raise(ArgumentError)
-  
+
           item = { 'id' => '1', 'event' => 'open' }
           smarter_worker.push_items(item)
-  
+
           execution = BatchExecution.new(smarter_worker)
           expect_any_instance_of(smarter_worker).to receive(:handle_error)
 
@@ -46,16 +46,28 @@ module Upperkut
       context 'when client doesnt implement handle_error method' do
         it 'requeue_item' do
           allow_any_instance_of(worker).to receive(:perform).and_raise(ArgumentError)
-  
+
           item = { 'id' => '1', 'event' => 'open' }
           worker.push_items(item)
-  
+
           expect(worker.metrics['size']).to eq 1
-  
+
           execution = BatchExecution.new(worker)
           expect { execution.execute }.to raise_error(ArgumentError)
           expect(worker.metrics['size']).to eq 1
-        end  
+        end
+
+        it 'keeps the same latency' do
+          allow_any_instance_of(worker).to receive(:perform).and_raise(ArgumentError)
+
+          item = Item.new({ 'id' => '1', 'event' => 'open' }, 2)
+          worker.push_items(item)
+
+          expect {
+            execution = BatchExecution.new(worker)
+            execution.execute rescue nil
+          }.not_to change { worker.metrics['latency'].to_i }
+        end
       end
     end
   end
