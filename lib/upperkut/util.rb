@@ -13,6 +13,14 @@ module Upperkut
       klass_name
     end
 
+    # Public:
+    #  Normalize hash and hash arrays into a hash of Items.
+    #  An Item object contains metadata, for example the timestamp from the moment it was enqueued,
+    #   that we need to carry through multiple execution tries.
+    #
+    #  When the execution fails, we need to schedule the whole batch for retry, and scheduling
+    #   an Item will make Upperkut understand that we're not dealing with a new batch,
+    #   so metrics like latency will increase.
     def normalize_items(items)
       items = [items] unless items.is_a?(Array)
 
