@@ -17,6 +17,10 @@ module Upperkut
       @body[key] = value
     end
 
+    def key?(key)
+      @body.key?(key)
+    end
+
     def to_json
       JSON.generate(
         'body' => @body,
