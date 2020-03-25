@@ -1,4 +1,5 @@
 require 'json'
+require 'upperkut/job'
 
 module Upperkut
   module Util
@@ -13,21 +14,13 @@ module Upperkut
     end
 
     def encode_json_items(items)
-      items = items.collect do |i|
-        JSON.generate(
-          'enqueued_at' => Time.now.to_i,
-          'body' => i
-        )
-      end
+      items.collect { |i| i.to_json }
     end
 
     def decode_json_items(items)
-      items.collect! do |i|
-        JSON.parse(i) if i
+      items.each_with_object([]) do |item, memo|
+        memo << Job.from_json(item) if item
       end
-
-      items.compact!
-      items
     end
   end
 end

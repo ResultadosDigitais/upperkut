@@ -33,8 +33,6 @@ module Upperkut
 
           items = strategy.fetch_items
 
-          binding.pry
-
           expect(items.last.body).to eq('event' => 'click')
         end
 
@@ -51,9 +49,7 @@ module Upperkut
         it 'returns the head items off queue' do
           strategy.push_items([{ 'event' => 'open' }, { 'event' => 'click' }])
 
-          items = strategy.fetch_items.collect do |item|
-            item['body']
-          end
+          items = strategy.fetch_items.map(&:body)
 
           expect(items).to eq([{ 'event' => 'open' }, { 'event' => 'click' }])
         end

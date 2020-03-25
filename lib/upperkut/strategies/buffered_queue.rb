@@ -1,3 +1,4 @@
+require 'upperkut/job'
 require 'upperkut/util'
 require 'upperkut/redis_pool'
 require 'upperkut/strategies/base'
@@ -29,6 +30,11 @@ module Upperkut
       def push_items(items = [])
         items = [items] if items.is_a?(Hash)
         return false if items.empty?
+
+        items.map! do |item|
+          next item if items.is_a?(Job)
+          Job.new(item)
+        end
 
         redis do |conn|
           conn.rpush(key, encode_json_items(items))
@@ -91,12 +97,12 @@ module Upperkut
       end
 
       def latency
-        item = redis { |conn| conn.lrange(key, 0, 0) }
-        item = decode_json_items(item).first
-        return 0 unless item
+        items = redis { |conn| conn.lrange(key, 0, 0) }
+        first_item = decode_json_items(items).first
+        return 0 unless first_item
 
         now = Time.now.to_f
-        now - item.fetch('enqueued_at', Time.now).to_f
+        now - first_item.enqueued_at.to_f
       end
 
       def redis
