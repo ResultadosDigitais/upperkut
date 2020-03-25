@@ -1,3 +1,7 @@
+require 'upperkut/util'
+require 'upperkut/redis_pool'
+require 'upperkut/strategies/base'
+
 module Upperkut
   module Strategies
     # Public: Queue that prevent a single tenant from taking over.
@@ -90,7 +94,7 @@ module Upperkut
       #
       # Returns true when success, raise when error.
       def push_items(items = [])
-        items = [items] if items.is_a?(Hash)
+        items = normalize_items(items)
         return false if items.empty?
 
         redis do |conn|
@@ -104,7 +108,7 @@ module Upperkut
 
             conn.eval(ENQUEUE_ITEM,
                       keys: keys,
-                      argv: [encode_json_items([item])])
+                      argv: [item.to_json])
           end
         end
 

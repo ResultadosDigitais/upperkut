@@ -43,9 +43,7 @@ module Upperkut
             {'tenant_id' => 3, 'some_text' => 'item 3.2'},
           ])
 
-          items = strategy.fetch_items.collect do |item|
-            item['body']
-          end
+          items = strategy.fetch_items.map(&:body)
 
           expect(items).to eq([
             {'tenant_id' => 1, 'some_text' => 'item 1.1'},

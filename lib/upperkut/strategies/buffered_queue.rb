@@ -27,11 +27,11 @@ module Upperkut
       end
 
       def push_items(items = [])
-        items = [items] if items.is_a?(Hash)
+        items = normalize_items(items)
         return false if items.empty?
 
         redis do |conn|
-          conn.rpush(key, encode_json_items(items))
+          conn.rpush(key, items.map(&:to_json))
         end
 
         true
@@ -91,12 +91,12 @@ module Upperkut
       end
 
       def latency
-        item = redis { |conn| conn.lrange(key, 0, 0) }
-        item = decode_json_items(item).first
-        return 0 unless item
+        items = redis { |conn| conn.lrange(key, 0, 0) }
+        first_item = decode_json_items(items).first
+        return 0 unless first_item
 
         now = Time.now.to_f
-        now - item.fetch('enqueued_at', Time.now).to_f
+        now - first_item.enqueued_at.to_f
       end
 
       def redis

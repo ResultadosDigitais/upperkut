@@ -1,4 +1,5 @@
 require 'json'
+require 'upperkut/item'
 
 module Upperkut
   module Util
@@ -12,22 +13,28 @@ module Upperkut
       klass_name
     end
 
-    def encode_json_items(items)
-      items = items.collect do |i|
-        JSON.generate(
-          'enqueued_at' => Time.now.to_i,
-          'body' => i
-        )
+    # Public:
+    #  Normalize hash and hash arrays into a hash of Items.
+    #  An Item object contains metadata, for example the timestamp from the moment it was enqueued,
+    #   that we need to carry through multiple execution tries.
+    #
+    #  When the execution fails, we need to schedule the whole batch for retry, and scheduling
+    #   an Item will make Upperkut understand that we're not dealing with a new batch,
+    #   so metrics like latency will increase.
+    def normalize_items(items)
+      items = [items] unless items.is_a?(Array)
+
+      items.map do |item|
+        next item if item.is_a?(Item)
+
+        Item.new(item)
       end
     end
 
     def decode_json_items(items)
-      items.collect! do |i|
-        JSON.parse(i) if i
+      items.each_with_object([]) do |item, memo|
+        memo << Item.from_json(item) if item
       end
-
-      items.compact!
-      items
     end
   end
 end

@@ -31,11 +31,9 @@ module Upperkut
           strategy.push_items([{ 'event' => 'open' }])
           strategy.push_items('event' => 'click')
 
-          items = strategy.fetch_items.collect do |item|
-            item['body']
-          end
+          items = strategy.fetch_items
 
-          expect(items.last).to eq('event' => 'click')
+          expect(items.last.body).to eq('event' => 'click')
         end
 
         context 'when items isn\'t a array' do
@@ -51,9 +49,7 @@ module Upperkut
         it 'returns the head items off queue' do
           strategy.push_items([{ 'event' => 'open' }, { 'event' => 'click' }])
 
-          items = strategy.fetch_items.collect do |item|
-            item['body']
-          end
+          items = strategy.fetch_items.map(&:body)
 
           expect(items).to eq([{ 'event' => 'open' }, { 'event' => 'click' }])
         end

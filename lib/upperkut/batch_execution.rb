@@ -12,19 +12,16 @@ module Upperkut
     def execute
       worker_instance = @worker.new
       items = @worker.fetch_items.freeze
-
-      items_body = items.collect do |item|
-        item['body']
-      end
+      items_body = items.map(&:body)
 
       @worker.server_middlewares.invoke(@worker, items) do
-        worker_instance.perform(items_body.dup)
+        worker_instance.perform(items_body)
       end
     rescue StandardError => error
       @logger.info(
         action: :requeue,
         ex: error,
-        item_size: items_body.size
+        item_size: items.size
       )
 
       @logger.error(error.backtrace.join("\n"))
@@ -32,10 +29,9 @@ module Upperkut
       if worker_instance.respond_to?(:handle_error)
         worker_instance.handle_error(error, items_body)
         return
-      else
-        @worker.push_items(items_body)
       end
 
+      @worker.push_items(items)
       raise error
     end
   end
