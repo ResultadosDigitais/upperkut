@@ -12,9 +12,9 @@ module Upperkut
     def execute
       worker_instance = @worker.new
       items = @worker.fetch_items.freeze
+      items_body = items.map { |item| item.body }
 
       @worker.server_middlewares.invoke(@worker, items) do
-        items_body = items.map { |item| item.body }
         worker_instance.perform(items_body)
       end
     rescue StandardError => error
@@ -27,7 +27,7 @@ module Upperkut
       @logger.error(error.backtrace.join("\n"))
 
       if worker_instance.respond_to?(:handle_error)
-        worker_instance.handle_error(error, items)
+        worker_instance.handle_error(error, items_body)
         return
       end
 
