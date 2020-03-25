@@ -15,7 +15,7 @@ module Upperkut
       items_body = items.map(&:body)
 
       @worker.server_middlewares.invoke(@worker, items) do
-        worker_instance.perform(items_body)
+        worker_instance.perform(items_body.dup)
       end
     rescue StandardError => error
       @logger.info(

@@ -22,7 +22,7 @@ module Upperkut
     end
 
     def body
-      @body.dup
+      @body
     end
 
     def to_json
