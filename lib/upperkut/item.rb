@@ -1,5 +1,5 @@
 module Upperkut
-  class Job
+  class Item
     attr_reader :body, :enqueued_at
 
     def initialize(body, enqueued_at = nil)
@@ -28,8 +28,8 @@ module Upperkut
       )
     end
 
-    def self.from_json(job_json)
-      hash = JSON.parse(job_json)
+    def self.from_json(item_json)
+      hash = JSON.parse(item_json)
       new(hash['body'], hash['enqueued_at'])
     end
   end

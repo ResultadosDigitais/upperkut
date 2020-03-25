@@ -1,16 +1,16 @@
 require 'spec_helper'
-require 'upperkut/job'
+require 'upperkut/item'
 
 module Upperkut
-  RSpec.describe Job do
-    subject(:job) { described_class.new({ my_property: 1 }, current_timestamp) }
+  RSpec.describe Item do
+    subject(:item) { described_class.new({ my_property: 1 }, current_timestamp) }
 
     let(:current_timestamp) { Time.now.utc.to_i }
 
     it 'allows accessing body properties like a hash' do
-      job[:my_another_property] = 2
+      item[:my_another_property] = 2
 
-      expect(job[:my_another_property]).to eq(2)
+      expect(item[:my_another_property]).to eq(2)
     end
 
     describe '#initialize' do
@@ -18,13 +18,13 @@ module Upperkut
         let(:current_timestamp) { nil }
 
         it 'uses the current timestamp as fallback' do
-          expect(job.enqueued_at).to be_within(1).of(Time.now.to_i)
+          expect(item.enqueued_at).to be_within(1).of(Time.now.to_i)
         end
       end
     end
 
     describe '#to_json' do
-      subject { job.to_json }
+      subject { item.to_json }
 
       it do
         expected_hash = {
@@ -37,21 +37,21 @@ module Upperkut
     end
 
     describe '.from_json' do
-      subject(:unserialized_job) { described_class.from_json(job_json) }
+      subject(:unserialized_item) { described_class.from_json(item_json) }
 
-      let(:job_json) do
+      let(:item_json) do
         {
           body: { my_property: 1 },
           enqueued_at: current_timestamp,
         }.to_json
       end
 
-      it 'fetches the job body from the json' do
-        expect(unserialized_job.body).to eq({ 'my_property' => 1 })
+      it 'fetches the item body from the json' do
+        expect(unserialized_item.body).to eq({ 'my_property' => 1 })
       end
 
-      it 'fetches the job enqueued_at from the json' do
-        expect(unserialized_job.enqueued_at).to eq(current_timestamp)
+      it 'fetches the item enqueued_at from the json' do
+        expect(unserialized_item.enqueued_at).to eq(current_timestamp)
       end
     end
   end

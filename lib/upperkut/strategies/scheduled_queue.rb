@@ -34,13 +34,8 @@ module Upperkut
       end
 
       def push_items(items = [])
-        items = [items] if items.is_a?(Hash)
+        items = normalize_items(items)
         return false if items.empty?
-
-        items.map! do |item|
-          next item if items.is_a?(Job)
-          Job.new(item)
-        end
 
         redis do |conn|
           items.each do |item|

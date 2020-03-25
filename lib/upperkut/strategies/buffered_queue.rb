@@ -1,4 +1,4 @@
-require 'upperkut/job'
+require 'upperkut/item'
 require 'upperkut/util'
 require 'upperkut/redis_pool'
 require 'upperkut/strategies/base'
@@ -28,16 +28,11 @@ module Upperkut
       end
 
       def push_items(items = [])
-        items = [items] if items.is_a?(Hash)
+        items = normalize_items(items)
         return false if items.empty?
 
-        items.map! do |item|
-          next item if items.is_a?(Job)
-          Job.new(item)
-        end
-
         redis do |conn|
-          conn.rpush(key, encode_json_items(items))
+          conn.rpush(key, items.map(&:to_json))
         end
 
         true

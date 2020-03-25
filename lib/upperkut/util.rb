@@ -1,5 +1,5 @@
 require 'json'
-require 'upperkut/job'
+require 'upperkut/item'
 
 module Upperkut
   module Util
@@ -13,13 +13,18 @@ module Upperkut
       klass_name
     end
 
-    def encode_json_items(items)
-      items.collect { |i| i.to_json }
+    def normalize_items(items)
+      items = [items] if items.is_a?(Hash)
+
+      items.map do |item|
+        next item if items.is_a?(Item)
+        Item.new(item)
+      end
     end
 
     def decode_json_items(items)
       items.each_with_object([]) do |item, memo|
-        memo << Job.from_json(item) if item
+        memo << Item.from_json(item) if item
       end
     end
   end
