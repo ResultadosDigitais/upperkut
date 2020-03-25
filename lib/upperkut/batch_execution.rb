@@ -12,7 +12,7 @@ module Upperkut
     def execute
       worker_instance = @worker.new
       items = @worker.fetch_items.freeze
-      items_body = items.map { |item| item.body }
+      items_body = items.map(&:body)
 
       @worker.server_middlewares.invoke(@worker, items) do
         worker_instance.perform(items_body)
