@@ -37,10 +37,15 @@ module Upperkut
         items = [items] if items.is_a?(Hash)
         return false if items.empty?
 
+        items.map! do |item|
+          next item if items.is_a?(Job)
+          Job.new(item)
+        end
+
         redis do |conn|
           items.each do |item|
             ensure_timestamp_attr(item)
-            conn.zadd(key, item['timestamp'], encode_json_item(item))
+            conn.zadd(key, item['timestamp'], item.to_json)
           end
         end
 
@@ -120,7 +125,7 @@ module Upperkut
 
         return 0 unless job
 
-        now_timestamp - job['body'].fetch('timestamp', now).to_f
+        now_timestamp - job['timestamp'].to_f
       end
 
       def setup_redis_pool
@@ -137,19 +142,12 @@ module Upperkut
         end
       end
 
-      def key
-        "upperkut:queued:#{to_underscore(@worker.name)}"
-      end
-
       def ensure_timestamp_attr(item)
         item['timestamp'] = Time.now.utc.to_i unless item.key?('timestamp')
       end
 
-      def encode_json_item(item)
-        JSON.generate(
-          'enqueued_at' => Time.now.utc.to_i,
-          'body' => item
-        )
+      def key
+        "upperkut:queued:#{to_underscore(@worker.name)}"
       end
     end
   end
