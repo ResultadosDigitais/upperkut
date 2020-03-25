@@ -25,8 +25,8 @@ module Upperkut
     end
 
     def self.from_json(job_json)
-      hash = JSON.parse(job_json, symbolize_names: true)
-      new(hash)
+      hash = JSON.parse(job_json)
+      new(hash['body'], hash['enqueued_at'])
     end
   end
 end

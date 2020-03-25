@@ -37,7 +37,7 @@ module Upperkut
     end
 
     describe '.from_json' do
-      subject { described_class.from_json(job_json) }
+      subject(:unserialized_job) { described_class.from_json(job_json) }
 
       let(:job_json) do
         {
@@ -47,11 +47,11 @@ module Upperkut
       end
 
       it 'fetches the job body from the json' do
-        expect(job.body).to eq({ my_property: 1 })
+        expect(unserialized_job.body).to eq({ 'my_property' => 1 })
       end
 
       it 'fetches the job enqueued_at from the json' do
-        expect(job.enqueued_at).to eq(current_timestamp)
+        expect(unserialized_job.enqueued_at).to eq(current_timestamp)
       end
     end
   end

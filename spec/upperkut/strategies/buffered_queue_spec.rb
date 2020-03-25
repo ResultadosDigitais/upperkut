@@ -31,11 +31,11 @@ module Upperkut
           strategy.push_items([{ 'event' => 'open' }])
           strategy.push_items('event' => 'click')
 
-          items = strategy.fetch_items.collect do |item|
-            item['body']
-          end
+          items = strategy.fetch_items
 
-          expect(items.last).to eq('event' => 'click')
+          binding.pry
+
+          expect(items.last.body).to eq('event' => 'click')
         end
 
         context 'when items isn\'t a array' do
