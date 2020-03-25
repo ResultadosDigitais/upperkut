@@ -31,6 +31,15 @@ module Upperkut
           [ 'my_property' => 1 ]
         )
       end
+
+      it 'knows how to handle a single Item class' do
+        items = Item.new('my_property' => 1)
+        normalized_items = normalize_items(items)
+
+        expect(normalized_items.map(&:body)).to eq(
+          [ 'my_property' => 1 ]
+        )
+      end
     end
 
     describe '#decode_json_items' do

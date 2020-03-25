@@ -14,7 +14,7 @@ module Upperkut
     end
 
     def normalize_items(items)
-      items = [items] if items.is_a?(Hash)
+      items = [items] unless items.is_a?(Array)
 
       items.map do |item|
         next item if item.is_a?(Item)
