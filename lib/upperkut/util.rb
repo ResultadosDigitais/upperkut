@@ -36,5 +36,22 @@ module Upperkut
         memo << Item.from_json(item) if item
       end
     end
+
+    def retry_block(retries_limit = 3, base_sleep = 2)
+      retries = 0
+
+      begin
+        yield
+      rescue StandardError => e
+        if retries < retries_limit
+          retries += 1
+          sleep_time = base_sleep ** retries
+          Kernel.sleep(sleep_time)
+          retry
+        end
+
+        raise
+      end
+    end
   end
 end
