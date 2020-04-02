@@ -1,8 +1,9 @@
 # Upperkut changes
 0.8.x
 --------
+- Added exponential backoff when push_items #57
 - Introducing Item to avoid losing enqueued at and report wrong latency
-  metrics, thanks to @jeangnc
+  metrics #56 thanks to @jeangnc
 
 0.7.x
 ---------
