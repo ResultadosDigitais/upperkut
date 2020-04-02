@@ -144,6 +144,7 @@ module Upperkut
                             RedisPool.new(@redis_options).create
                           end
                         end
+      end
     end
   end
 end
