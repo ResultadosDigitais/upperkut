@@ -30,8 +30,10 @@ module Upperkut
         items = normalize_items(items)
         return false if items.empty?
 
-        redis do |conn|
-          conn.rpush(key, items.map(&:to_json))
+        retry_block do
+          redis do |conn|
+            conn.rpush(key, items.map(&:to_json))
+          end
         end
 
         true
@@ -40,9 +42,11 @@ module Upperkut
       def fetch_items
         stop = [@batch_size, size].min
 
-        items = redis do |conn|
-          conn.multi do
-            stop.times { conn.lpop(key) }
+        items = retry_block do
+          redis do |conn|
+            conn.multi do
+              stop.times { conn.lpop(key) }
+            end
           end
         end
 
@@ -50,25 +54,31 @@ module Upperkut
       end
 
       def clear
-        redis { |conn| conn.del(key) }
+        retry_block do
+          redis { |conn| conn.del(key) }
+        end
       end
 
       def metrics
-        {
-          'latency' => latency,
-          'size' => size
-        }
+        retry_block do
+          {
+            'latency' => latency,
+            'size' => size
+          }
+        end
       end
 
       def process?
-        buff_size = size
+        retry_block do
+          buff_size = size
 
-        if fulfill_condition?(buff_size)
-          @waiting_time = 0
-          return true
-        else
-          @waiting_time += @worker.setup.polling_interval
-          return false
+          if fulfill_condition?(buff_size)
+            @waiting_time = 0
+            return true
+          else
+            @waiting_time += @worker.setup.polling_interval
+            return false
+          end
         end
       end
 
