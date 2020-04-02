@@ -28,6 +28,26 @@ module Upperkut
     let(:worker) { DummyWorker }
     let(:smarter_worker) { SmarterWorker }
 
+    context 'when something goes wrong while fetching items', :wip do
+      it 'it logs correctly' do
+        allow(DummyWorker).to receive(:fetch_items).and_raise(ArgumentError)
+
+        logger = spy('logger')
+        execution = BatchExecution.new(worker, logger)
+        expect { execution.execute }.to raise_error(ArgumentError)
+
+        expect(logger).to have_received(:error) do |args|
+          expect(args[:action]).to eq(:handle_execution_error)
+          expect(args[:ex]).to eq('ArgumentError')
+          expect(args[:backtrace]).to be
+          expect(args[:item_size]).to eq 0
+        end
+
+        expect_any_instance_of(DummyWorker).not_to receive(:push_items)
+        expect_any_instance_of(DummyWorker).not_to receive(:handle_error)
+      end
+    end
+
     context 'when something goes wrong while processing' do
       context 'when client implements handle_error method' do
         it 'calls .handle_error method' do
