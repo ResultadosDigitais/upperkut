@@ -42,15 +42,15 @@ module Upperkut
 
       begin
         yield
-      rescue StandardError => e
+      rescue StandardError => err
         if retries < retries_limit
           retries += 1
-          sleep_time = base_sleep ** retries
+          sleep_time = base_sleep**retries
           Kernel.sleep(sleep_time)
           retry
         end
 
-        raise
+        raise err
       end
     end
   end
