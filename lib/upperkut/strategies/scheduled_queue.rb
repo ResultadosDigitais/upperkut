@@ -28,9 +28,13 @@ module Upperkut
 
       def initialize(worker, options = {})
         @options = options
-        initialize_options
-        @redis_pool = setup_redis_pool
+        @redis_options = @options.fetch(:redis, {})
         @worker = worker
+
+        @batch_size = @options.fetch(
+          :batch_size,
+          Integer(ENV['UPPERKUT_BATCH_SIZE'] || 1000)
+        )
       end
 
       def push_items(items = [])
@@ -82,13 +86,12 @@ module Upperkut
 
       private
 
-      def initialize_options
-        @redis_options = @options.fetch(:redis, {})
+      def key
+        "upperkut:queued:#{to_underscore(@worker.name)}"
+      end
 
-        @batch_size = @options.fetch(
-          :batch_size,
-          Integer(ENV['UPPERKUT_BATCH_SIZE'] || 1000)
-        )
+      def ensure_timestamp_attr(item)
+        item['timestamp'] = Time.now.utc.to_i unless item.key?('timestamp')
       end
 
       def pop_values(redis_client, args)
@@ -132,18 +135,21 @@ module Upperkut
       def redis
         raise ArgumentError, 'requires a block' unless block_given?
 
-        @redis_pool.with do |conn|
-          yield conn
+        retry_block do
+          redis_pool.with do |conn|
+            yield conn
+          end
         end
       end
 
-      def ensure_timestamp_attr(item)
-        item['timestamp'] = Time.now.utc.to_i unless item.key?('timestamp')
-      end
-
-      def key
-        "upperkut:queued:#{to_underscore(@worker.name)}"
-      end
+      def redis_pool
+        @redis_pool ||= begin
+                          if @redis_options.is_a?(ConnectionPool)
+                            @redis_options
+                          else
+                            RedisPool.new(@redis_options).create
+                          end
+                        end
     end
   end
 end
