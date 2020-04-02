@@ -126,12 +126,6 @@ module Upperkut
         now_timestamp - job['timestamp'].to_f
       end
 
-      def setup_redis_pool
-        return @redis_options if @redis_options.is_a?(ConnectionPool)
-
-        RedisPool.new(options.fetch(:redis, {})).create
-      end
-
       def redis
         raise ArgumentError, 'requires a block' unless block_given?
 
