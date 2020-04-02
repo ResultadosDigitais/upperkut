@@ -57,5 +57,35 @@ module Upperkut
         end
       end
     end
+
+    describe '#retry_block' do
+      before do
+        allow(Kernel).to receive(:sleep).and_return(nil)
+      end
+
+      it 'retries the block within a limit' do
+        invocation_counter = 0
+        retry_block(2) { invocation_counter += 1; raise RuntimeError } rescue nil
+        expect(invocation_counter).to eq(3)
+      end
+
+      it 'waits exponentially to retry' do
+        expect(Kernel).to receive(:sleep).with(2 ** 1).ordered
+        expect(Kernel).to receive(:sleep).with(2 ** 2).ordered
+        expect(Kernel).to receive(:sleep).with(2 ** 3).ordered
+
+        retry_block(3, 2) { raise RuntimeError } rescue nil
+      end
+
+      it 'waits exponentially to retry' do
+        expect {
+          retry_block { raise RuntimeError }
+        }.to raise_error(RuntimeError)
+      end
+
+      it 'returns the yielded block result' do
+        expect(retry_block { 'my-return' }).to eq('my-return')
+      end
+    end
   end
 end

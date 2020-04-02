@@ -182,8 +182,10 @@ module Upperkut
       def redis
         raise ArgumentError, 'requires a block' unless block_given?
 
-        redis_pool.with do |conn|
-          yield conn
+        retry_block do
+          redis_pool.with do |conn|
+            yield conn
+          end
         end
       end
 
