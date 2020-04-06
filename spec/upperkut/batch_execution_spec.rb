@@ -28,7 +28,7 @@ module Upperkut
     let(:worker) { DummyWorker }
     let(:smarter_worker) { SmarterWorker }
 
-    context 'when something goes wrong while fetching items', :wip do
+    context 'when something goes wrong while fetching items' do
       it 'it logs correctly' do
         allow(DummyWorker).to receive(:fetch_items).and_raise(ArgumentError)
 
