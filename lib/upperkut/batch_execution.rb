@@ -25,15 +25,16 @@ module Upperkut
         item_size: Array(items).size
       )
 
-     raise unless items
+      if items
+        if worker_instance.respond_to?(:handle_error)
+          worker_instance.handle_error(error, items_body)
+          return
+        end
 
-      if worker_instance.respond_to?(:handle_error)
-        worker_instance.handle_error(error, items_body)
-        return
+        @worker.push_items(items)
       end
 
-      @worker.push_items(items)
-      raise error
+      raise
     end
   end
 end
