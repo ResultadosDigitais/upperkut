@@ -18,13 +18,14 @@ module Upperkut
         worker_instance.perform(items_body.dup)
       end
     rescue StandardError => error
-      @logger.info(
-        action: :requeue,
-        ex: error,
-        item_size: items.size
+      @logger.error(
+        action: :handle_execution_error,
+        ex: error.to_s,
+        backtrace: error.backtrace.join("\n"),
+        item_size: Array(items).size
       )
 
-      @logger.error(error.backtrace.join("\n"))
+     raise unless items
 
       if worker_instance.respond_to?(:handle_error)
         worker_instance.handle_error(error, items_body)
