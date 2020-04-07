@@ -4,16 +4,16 @@ module Upperkut
   class Processor
     def initialize(worker, logger = Upperkut::Logging.logger)
       @worker = worker
+      @worker_instance = @worker.new
       @logger = logger
     end
 
-    def execute
-      worker_instance = @worker.new
+    def process
       items = @worker.fetch_items.freeze
       items_body = items.map(&:body)
 
       @worker.server_middlewares.invoke(@worker, items) do
-        worker_instance.perform(items_body.dup)
+        @worker_instance.perform(items_body.dup)
       end
     rescue StandardError => error
       @logger.error(
@@ -24,8 +24,8 @@ module Upperkut
       )
 
       if items
-        if worker_instance.respond_to?(:handle_error)
-          worker_instance.handle_error(error, items_body)
+        if @worker_instance.respond_to?(:handle_error)
+          @worker_instance.handle_error(error, items_body)
           return
         end
 
