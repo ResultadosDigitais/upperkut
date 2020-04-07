@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'upperkut/util'
 require 'upperkut/processor'
 
 module Upperkut
@@ -8,8 +9,43 @@ module Upperkut
     let(:worker) { DummyWorker }
     let(:logger) { Logger.new(nil) }
 
+    class InMemoryStrategy
+      include Util
+
+      def initialize
+        @items = []
+      end
+
+      def push_items(items)
+        @items.concat(normalize_items(items))
+      end
+
+      def fetch_items
+        @items.slice!(0..10)
+      end
+
+      def clear
+        @items.clear
+      end
+
+      def process?
+        true
+      end
+
+      def metrics
+        {
+          'size' => @items.size,
+          'latency' => Time.now.to_i - @items.first.enqueued_at
+        }
+      end
+    end
+
     class DummyWorker
       include Worker
+
+      setup_upperkut do |config|
+        config.strategy = InMemoryStrategy.new
+      end
 
       def perform(_items); end
     end
