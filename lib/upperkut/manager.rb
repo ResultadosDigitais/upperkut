@@ -1,5 +1,5 @@
 require_relative 'core_ext'
-require_relative 'processor'
+require_relative 'worker_thread'
 require_relative 'worker'
 
 module Upperkut
@@ -18,7 +18,7 @@ module Upperkut
 
     def run
       @concurrency.times do
-        processor = Processor.new(self)
+        processor = WorkerThread.new(self)
         @processors << processor
         processor.run
       end
@@ -36,7 +36,7 @@ module Upperkut
       @processors.delete(processor)
       return if @stopped
 
-      processor = Processor.new(self)
+      processor = WorkerThread.new(self)
       @processors << processor
       processor.run
     end

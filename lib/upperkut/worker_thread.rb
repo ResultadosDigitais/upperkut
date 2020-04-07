@@ -1,7 +1,7 @@
 require_relative 'batch_execution'
 
 module Upperkut
-  class Processor
+  class WorkerThread
     def initialize(manager)
       @manager  = manager
       @worker   = @manager.worker
