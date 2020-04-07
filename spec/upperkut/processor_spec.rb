@@ -1,8 +1,10 @@
 require 'spec_helper'
-require 'upperkut/batch_execution'
+require 'upperkut/processor'
 
 module Upperkut
-  RSpec.describe BatchExecution do
+  RSpec.describe Processor do
+    subject(:processor) { described_class }
+
     class SmarterWorker
       include Worker
 
@@ -33,7 +35,7 @@ module Upperkut
         allow(DummyWorker).to receive(:fetch_items).and_raise(ArgumentError)
 
         logger = spy('logger')
-        execution = BatchExecution.new(worker, logger)
+        execution = processor.new(worker, logger)
         expect { execution.execute }.to raise_error(ArgumentError)
 
         expect(logger).to have_received(:error) do |args|
@@ -56,7 +58,7 @@ module Upperkut
           item = { 'id' => '1', 'event' => 'open' }
           smarter_worker.push_items(item)
 
-          execution = BatchExecution.new(smarter_worker)
+          execution = processor.new(smarter_worker)
           expect_any_instance_of(smarter_worker).to receive(:handle_error)
 
           expect { execution.execute }.not_to raise_error(ArgumentError)
@@ -72,7 +74,7 @@ module Upperkut
 
           expect(worker.metrics['size']).to eq 1
 
-          execution = BatchExecution.new(worker)
+          execution = processor.new(worker)
           expect { execution.execute }.to raise_error(ArgumentError)
           expect(worker.metrics['size']).to eq 1
         end
@@ -84,7 +86,7 @@ module Upperkut
           worker.push_items(item)
 
           expect {
-            execution = BatchExecution.new(worker)
+            execution = processor.new(worker)
             execution.execute rescue nil
           }.not_to change { worker.metrics['latency'].to_i }
         end

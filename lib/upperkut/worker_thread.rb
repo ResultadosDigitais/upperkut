@@ -1,4 +1,4 @@
-require_relative 'batch_execution'
+require_relative 'processor'
 
 module Upperkut
   class WorkerThread
@@ -52,7 +52,7 @@ module Upperkut
     end
 
     def process_batch
-      BatchExecution.new(@worker, @logger).execute
+      Processor.new(@worker, @logger).execute
     end
   end
 end

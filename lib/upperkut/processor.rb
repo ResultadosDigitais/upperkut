@@ -1,7 +1,7 @@
 require_relative 'logging'
 
 module Upperkut
-  class BatchExecution
+  class Processor
     def initialize(worker, logger = Upperkut::Logging.logger)
       @worker = worker
       @logger = logger
