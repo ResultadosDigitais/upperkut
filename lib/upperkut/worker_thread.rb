@@ -52,7 +52,7 @@ module Upperkut
     end
 
     def process_batch
-      Processor.new(@worker, @logger).execute
+      Processor.new(@worker, @logger).process
     end
   end
 end
