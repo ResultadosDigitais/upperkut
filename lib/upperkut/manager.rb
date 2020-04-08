@@ -14,32 +14,37 @@ module Upperkut
       @logger = opts.fetch(:logger, Logging.logger)
 
       @stopped = false
-      @processors = []
+      @threads = []
     end
 
     def run
       @concurrency.times do
-        processor = WorkerThread.new(self)
-        @processors << processor
-        processor.run
+        spawn_thread
       end
     end
 
     def stop
       @stopped = true
+      @threads.each(&:stop)
     end
 
     def kill
-      @processors.each(&:kill)
+      @threads.each(&:kill)
     end
 
-    def notify_killed_processor(processor)
-      @processors.delete(processor)
-      return if @stopped
+    def notify_killed_processor(thread)
+      @threads.delete(thread)
+      spawn_thread unless @stopped
+    end
 
-      processor = WorkerThread.new(self)
-      @processors << processor
-      processor.run
+    private
+
+    def spawn_thread
+      processor = Processor.new(worker, logger)
+
+      thread = WorkerThread.new(self, processor)
+      @threads << thread
+      thread.run
     end
   end
 end
