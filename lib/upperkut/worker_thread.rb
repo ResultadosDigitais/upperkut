@@ -2,21 +2,17 @@ require_relative 'processor'
 
 module Upperkut
   class WorkerThread
-    def initialize(manager)
-      @manager  = manager
-      @worker   = @manager.worker
-      @logger   = @manager.logger
-      @strategy = @worker.strategy
-
-      @sleeping_time = 0
+    def initialize(manager, processor)
+      @manager = manager
+      @processor = processor
     end
 
     def run
       @thread ||= Thread.new do
         begin
-          process
+          @processor.process_blocking
         rescue Exception => e
-          @logger.debug(
+          @manager.logger.debug(
             action: :processor_killed,
             reason: e,
             stacktrace: e.backtrace
@@ -27,32 +23,15 @@ module Upperkut
       end
     end
 
+    def stop
+      @processor.stop
+    end
+
     def kill
       return unless @thread
 
       @thread.raise Upperkut::Shutdown
       @thread.value # wait
-    end
-
-    private
-
-    def process
-      loop do
-        next if @manager.stopped
-
-        if @strategy.process?
-          @sleeping_time = 0
-          process_batch
-          next
-        end
-
-        @sleeping_time += sleep(@worker.setup.polling_interval)
-        @logger.debug(sleeping_time: @sleeping_time)
-      end
-    end
-
-    def process_batch
-      Processor.new(@worker, @logger).process
     end
   end
 end
