@@ -25,7 +25,7 @@ module Upperkut
         @processing = false
       end
 
-      def process_blocking
+      def blocking_process
         @processing = true
       end
 

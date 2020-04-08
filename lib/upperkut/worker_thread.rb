@@ -10,7 +10,7 @@ module Upperkut
     def run
       @thread ||= Thread.new do
         begin
-          @processor.process_blocking
+          @processor.blocking_process
         rescue Exception => e
           @manager.logger.debug(
             action: :processor_killed,

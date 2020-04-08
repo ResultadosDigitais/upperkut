@@ -124,7 +124,7 @@ module Upperkut
       end
     end
 
-    describe '#process_blocking' do
+    describe '#blocking_process' do
       before do
         allow(worker.strategy).to receive(:fetch_items).and_call_original
       end
@@ -132,14 +132,14 @@ module Upperkut
       context 'when it is stopped' do
         it 'stop processing' do
           processor.stop
-          expect(processor.process_blocking).to be_nil
+          expect(processor.blocking_process).to be_nil
         end
       end
 
       it 'processes only when the strategy decides to' do
         begin
           Timeout::timeout(0.1) do
-            processor.process_blocking
+            processor.blocking_process
           end
         rescue Timeout::Error
         end
@@ -155,7 +155,7 @@ module Upperkut
         it 'sleeps for a while' do
           begin
             Timeout::timeout(0.1) do
-              processor.process_blocking
+              processor.blocking_process
             end
           rescue Timeout::Error
           end

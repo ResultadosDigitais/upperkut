@@ -35,7 +35,7 @@ module Upperkut
       raise
     end
 
-    def process_blocking
+    def blocking_process
       sleeping_time = 0
 
       loop do
