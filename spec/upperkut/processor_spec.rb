@@ -85,7 +85,7 @@ module Upperkut
 
       context 'when something goes wrong while processing' do
         before do
-            allow_any_instance_of(worker).to receive(:perform).and_raise(ArgumentError)
+          allow_any_instance_of(worker).to receive(:perform).and_raise(ArgumentError)
         end
 
         context 'when client implements handle_error method' do
@@ -120,6 +120,41 @@ module Upperkut
               processor.process rescue nil
             }.not_to change { worker.metrics['latency'].to_i }
           end
+        end
+      end
+    end
+
+    describe '#process_blocking' do
+      before do
+        allow(worker.strategy).to receive(:fetch_items).and_call_original
+      end
+
+      context 'when it is stopped' do
+        it 'stop processing' do
+          processor.stop
+          expect(processor.process_blocking).to be_nil
+        end
+      end
+
+      it 'processes only when the strategy decides to' do
+        Timeout::timeout(0.1) do
+          processor.process_blocking
+        end
+      rescue Timeout::Error
+        expect(worker.strategy).to have_received(:fetch_items).at_least(1)
+      end
+
+      context 'when the strategy decides not to process' do
+        before do
+          allow(worker.strategy).to receive(:process?).and_return(false)
+        end
+
+        it 'sleeps for a while' do
+          Timeout::timeout(0.1) do
+            processor.process_blocking
+          end
+        rescue Timeout::Error
+          expect(worker.strategy).not_to have_received(:fetch_items)
         end
       end
     end

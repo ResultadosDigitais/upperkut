@@ -34,5 +34,26 @@ module Upperkut
 
       raise
     end
+
+    def process_blocking
+      sleeping_time = 0
+
+      loop do
+        break if @stopped
+
+        if @worker.strategy.process?
+          sleeping_time = 0
+          process
+          next
+        end
+
+        sleeping_time += sleep(@worker.setup.polling_interval)
+        @logger.debug(sleeping_time: sleeping_time)
+      end
+    end
+
+    def stop
+      @stopped = true
+    end
   end
 end
