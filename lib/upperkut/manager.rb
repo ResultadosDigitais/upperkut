@@ -5,7 +5,7 @@ require_relative 'worker'
 module Upperkut
   class Manager
     attr_accessor :worker
-    attr_reader :stopped, :logger, :concurrency, :processors
+    attr_reader :stopped, :logger, :concurrency
 
     def initialize(opts = {})
       self.worker = opts.fetch(:worker).constantize
