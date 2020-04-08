@@ -1,5 +1,6 @@
 require_relative 'core_ext'
 require_relative 'worker_thread'
+require_relative 'logging'
 require_relative 'worker'
 
 module Upperkut
@@ -10,7 +11,7 @@ module Upperkut
     def initialize(opts = {})
       self.worker = opts.fetch(:worker).constantize
       @concurrency = opts.fetch(:concurrency, 1)
-      @logger = opts.fetch(:logger, Upperkut::Logging.logger)
+      @logger = opts.fetch(:logger, Logging.logger)
 
       @stopped = false
       @processors = []

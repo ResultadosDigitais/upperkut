@@ -2,7 +2,7 @@ require_relative 'logging'
 
 module Upperkut
   class Processor
-    def initialize(worker, logger = Upperkut::Logging.logger)
+    def initialize(worker, logger = Logging.logger)
       @worker = worker
       @worker_instance = @worker.new
       @logger = logger
