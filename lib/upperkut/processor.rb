@@ -32,7 +32,7 @@ module Upperkut
         @worker.push_items(items)
       end
 
-      raise
+      raise error
     end
 
     def blocking_process
