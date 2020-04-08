@@ -137,10 +137,13 @@ module Upperkut
       end
 
       it 'processes only when the strategy decides to' do
-        Timeout::timeout(0.1) do
-          processor.process_blocking
+        begin
+          Timeout::timeout(0.1) do
+            processor.process_blocking
+          end
+        rescue Timeout::Error
         end
-      rescue Timeout::Error
+
         expect(worker.strategy).to have_received(:fetch_items).at_least(1)
       end
 
@@ -150,10 +153,13 @@ module Upperkut
         end
 
         it 'sleeps for a while' do
-          Timeout::timeout(0.1) do
-            processor.process_blocking
+          begin
+            Timeout::timeout(0.1) do
+              processor.process_blocking
+            end
+          rescue Timeout::Error
           end
-        rescue Timeout::Error
+
           expect(worker.strategy).not_to have_received(:fetch_items)
         end
       end
