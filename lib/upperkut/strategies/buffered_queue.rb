@@ -53,11 +53,10 @@ module Upperkut
         redis { |conn| conn.del(key) }
       end
 
-      def metrics
-        {
-          'latency' => latency,
-          'size' => size
-        }
+      def ack(_items); end
+
+      def nack(items)
+        push_items(items)
       end
 
       def process?
@@ -70,6 +69,13 @@ module Upperkut
           @waiting_time += @worker.setup.polling_interval
           return false
         end
+      end
+
+      def metrics
+        {
+          'latency' => latency,
+          'size' => size
+        }
       end
 
       private
