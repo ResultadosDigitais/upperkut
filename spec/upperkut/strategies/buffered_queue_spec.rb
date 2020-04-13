@@ -66,14 +66,13 @@ module Upperkut
 
       describe '#metrics' do
         it 'returns correct latency' do
-          allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:00'))
+          travel_to(Time.parse('2015-01-01 00:00:00'))
           strategy.push_items('event' => 'open', 'k' => 1)
 
-          allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:04'))
+          travel_to(Time.parse('2015-01-01 00:00:04'))
           strategy.push_items('event' => 'open', 'k' => 1)
 
-          allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:10'))
-
+          travel_to(Time.parse('2015-01-01 00:00:10'))
           expect(strategy.metrics['latency']).to eq 10.0
         end
       end
