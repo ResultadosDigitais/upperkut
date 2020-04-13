@@ -5,6 +5,8 @@ require 'time'
 module Upperkut
   module Strategies
     RSpec.describe BufferedQueue do
+      subject(:strategy) { described_class.new(DummyWorker) }
+
       # DummyWorker class to use in tests
       class DummyWorker
         include Upperkut::Worker
@@ -13,8 +15,6 @@ module Upperkut
           config.strategy = strategy
         end
       end
-
-      subject(:strategy) { described_class.new(DummyWorker) }
 
       before do
         strategy.clear
