@@ -24,6 +24,20 @@ module Upperkut
         raise NotImplementedError
       end
 
+      # Public: Confirms that items have been processed successfully.
+      #
+      # items - The Array of items do be confirmed.
+      def ack(_items)
+        raise NotImplementedError
+      end
+
+      # Public: Informs that items have been not processed successfully and therefore must be re-processed.
+      #
+      # items - The Array of items do be unacknowledged.
+      def nack(_items)
+        raise NotImplementedError
+      end
+
       # Public: Tells when to execute the event processing,
       # when this condition is met so the events are dispatched to
       # the worker.
