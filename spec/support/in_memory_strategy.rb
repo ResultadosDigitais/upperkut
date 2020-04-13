@@ -3,11 +3,12 @@ require 'upperkut/util'
 class InMemoryStrategy
   include Upperkut::Util
 
-  attr_reader :items, :processing
+  attr_reader :items, :acked, :nacked
 
   def initialize
     @items = []
-    @processing = []
+    @acked = []
+    @nacked = []
   end
 
   def push_items(items)
@@ -19,13 +20,18 @@ class InMemoryStrategy
   end
 
   def ack(items)
+    @acked.concat(items)
   end
 
   def nack(items)
+    @nacked.concat(items)
+    @items.concat(items)
   end
 
   def clear
     @items.clear
+    @acked.clear
+    @nacked.clear
   end
 
   def process?
@@ -33,9 +39,15 @@ class InMemoryStrategy
   end
 
   def metrics
+    latency = if @items.size.zero?
+                0
+              else
+                Time.now.to_i - @items.first.enqueued_at
+              end
+
     {
       'size' => @items.size,
-      'latency' => Time.now.to_i - @items.first.enqueued_at
+      'latency' => latency
     }
   end
 end

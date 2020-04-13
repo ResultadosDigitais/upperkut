@@ -31,6 +31,15 @@ module Upperkut
     end
 
     describe '#process' do
+      it 'acknowledges performed items' do
+        item = { 'id' => '1', 'event' => 'open' }
+        worker.push_items(item)
+
+        expect { processor.process }.to change { strategy.acked }.to([
+          an_object_having_attributes(body: item)
+        ])
+      end
+
       context 'when something goes wrong while fetching items' do
         let(:logger) { spy('logger') }
 
@@ -56,6 +65,15 @@ module Upperkut
       context 'when something goes wrong while processing' do
         before do
           allow_any_instance_of(worker).to receive(:perform).and_raise(ArgumentError)
+        end
+
+        it 'mark items as not-acknowledged' do
+          item = { 'id' => '1', 'event' => 'open' }
+          worker.push_items(item)
+
+          expect { processor.process }.to change { strategy.nacked }.to([
+            an_object_having_attributes(body: item)
+          ]).and raise_error(ArgumentError)
         end
 
         context 'when client implements handle_error method' do

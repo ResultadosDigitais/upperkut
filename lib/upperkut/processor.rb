@@ -4,6 +4,7 @@ module Upperkut
   class Processor
     def initialize(worker, logger = Logging.logger)
       @worker = worker
+      @strategy = worker.strategy
       @worker_instance = @worker.new
       @logger = logger
     end
@@ -15,6 +16,8 @@ module Upperkut
       @worker.server_middlewares.invoke(@worker, items) do
         @worker_instance.perform(items_body.dup)
       end
+
+      @strategy.ack(items)
     rescue StandardError => error
       @logger.error(
         action: :handle_execution_error,
@@ -29,7 +32,7 @@ module Upperkut
           return
         end
 
-        @worker.push_items(items)
+        @strategy.nack(items)
       end
 
       raise error
@@ -41,7 +44,7 @@ module Upperkut
       loop do
         break if @stopped
 
-        if @worker.strategy.process?
+        if @strategy.process?
           sleeping_time = 0
           process
           next
