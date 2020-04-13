@@ -1,44 +1,50 @@
 require_relative 'core_ext'
-require_relative 'processor'
+require_relative 'worker_thread'
+require_relative 'logging'
 require_relative 'worker'
 
 module Upperkut
   class Manager
     attr_accessor :worker
-    attr_reader :stopped, :logger, :concurrency, :processors
+    attr_reader :stopped, :logger, :concurrency
 
     def initialize(opts = {})
       self.worker = opts.fetch(:worker).constantize
       @concurrency = opts.fetch(:concurrency, 1)
-      @logger = opts.fetch(:logger, Upperkut::Logging.logger)
+      @logger = opts.fetch(:logger, Logging.logger)
 
       @stopped = false
-      @processors = []
+      @threads = []
     end
 
     def run
       @concurrency.times do
-        processor = Processor.new(self)
-        @processors << processor
-        processor.run
+        spawn_thread
       end
     end
 
     def stop
       @stopped = true
+      @threads.each(&:stop)
     end
 
     def kill
-      @processors.each(&:kill)
+      @threads.each(&:kill)
     end
 
-    def notify_killed_processor(processor)
-      @processors.delete(processor)
-      return if @stopped
+    def notify_killed_processor(thread)
+      @threads.delete(thread)
+      spawn_thread unless @stopped
+    end
 
-      processor = Processor.new(self)
-      @processors << processor
-      processor.run
+    private
+
+    def spawn_thread
+      processor = Processor.new(worker, logger)
+
+      thread = WorkerThread.new(self, processor)
+      @threads << thread
+      thread.run
     end
   end
 end

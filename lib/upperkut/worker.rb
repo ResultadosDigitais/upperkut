@@ -1,7 +1,6 @@
 require 'forwardable'
 require 'upperkut/strategies/buffered_queue'
 require 'upperkut/middleware'
-require 'upperkut/util'
 require 'upperkut'
 
 module Upperkut
