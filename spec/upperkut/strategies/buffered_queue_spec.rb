@@ -20,7 +20,7 @@ module Upperkut
         strategy.clear
       end
 
-      describe '.push_items' do
+      describe '#push_items' do
         it 'insert items in the queue' do
           expect do
             strategy.push_items([{ 'event' => 'open' }, { 'event' => 'click' }])
@@ -45,7 +45,7 @@ module Upperkut
         end
       end
 
-      describe '.fetch_items' do
+      describe '#fetch_items' do
         it 'returns the head items off queue' do
           strategy.push_items([{ 'event' => 'open' }, { 'event' => 'click' }])
 
@@ -55,7 +55,7 @@ module Upperkut
         end
       end
 
-      describe '.latency' do
+      describe '#latency' do
         it 'returns correct latency' do
           allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:00'))
           strategy.push_items('event' => 'open', 'k' => 1)
@@ -69,7 +69,7 @@ module Upperkut
         end
       end
 
-      describe '.clear' do
+      describe '#clear' do
         it 'deletes the queue' do
           strategy.push_items(['event' => 'open'])
           expect do

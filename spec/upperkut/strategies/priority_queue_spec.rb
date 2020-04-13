@@ -26,7 +26,7 @@ module Upperkut
         strategy.clear
       end
 
-      describe '.push_items' do
+      describe '#push_items' do
         it 'avoids contiguous priority keys' do
           strategy.push_items([
             {'tenant_id' => 1, 'some_text' => 'item 1.1'},
@@ -56,7 +56,7 @@ module Upperkut
         end
       end
 
-      describe '.clear' do
+      describe '#clear' do
         it 'deletes the queue' do
           strategy.push_items(['tenant_id' => 1, 'event' => 'open'])
 
@@ -66,7 +66,7 @@ module Upperkut
         end
       end
 
-      describe '.metrics' do
+      describe '#metrics' do
         it 'returns the number of items to be processed' do
           strategy.push_items([
             {'tenant_id' => 1, 'some_text' => 'item 1.1'},
