@@ -5,7 +5,7 @@ module Upperkut
     def initialize(worker, logger = Logging.logger)
       @worker = worker
       @strategy = worker.strategy
-      @worker_instance = @worker.new
+      @worker_instance = worker.new
       @logger = logger
     end
 
