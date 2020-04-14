@@ -105,7 +105,7 @@ module Upperkut
         redis { |conn| conn.del(key) }
       end
 
-      def ack(items);
+      def ack(items)
         raise ArgumentError, 'Invalid item' unless items.all?(Item)
 
         redis do |conn|
