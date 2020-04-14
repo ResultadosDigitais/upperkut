@@ -27,10 +27,13 @@ module Upperkut
       #  processing time.
       ENQUEUE_ITEM = %(
         local increment = 1
-        local current_checkpoint = tonumber(redis.call("GET", KEYS[1])) or 0
-        local score_key = KEYS[2]
+        local checkpoint_key = KEYS[1]
+        local counter_key = KEYS[2]
+        local score_key = KEYS[3]
+        local queue_key = KEYS[4]
+        local current_checkpoint = tonumber(redis.call("GET", checkpoint_key)) or 0
+        local current_counter = tonumber(redis.call("INCR", counter_key))
         local current_score = tonumber(redis.call("GET", score_key)) or 0
-        local queue_key = KEYS[3]
         local next_score = nil
 
         if current_score >= current_checkpoint then
@@ -40,7 +43,7 @@ module Upperkut
         end
 
         redis.call("SETEX", score_key, #{ONE_DAY_IN_SECONDS}, next_score)
-        redis.call("ZADD", queue_key, next_score, ARGV[1])
+        redis.call("ZADD", queue_key, next_score + tonumber('0.' .. current_counter), ARGV[1])
 
         return next_score
       ).freeze
@@ -102,7 +105,8 @@ module Upperkut
             priority_key = @priority_key.call(item)
             score_key = "#{queue_key}:#{priority_key}:score"
 
-            keys = [queue_checkpoint_key,
+            keys = [checkpoint_key,
+                    counter_key,
                     score_key,
                     queue_key]
 
@@ -123,7 +127,7 @@ module Upperkut
 
         items = redis do |conn|
           conn.eval(DEQUEUE_ITEM,
-                    keys: [queue_checkpoint_key, queue_key],
+                    keys: [checkpoint_key, queue_key],
                     argv: [batch_size])
         end
 
@@ -159,8 +163,12 @@ module Upperkut
 
       private
 
-      def queue_checkpoint_key
+      def checkpoint_key
         "#{queue_key}:checkpoint"
+      end
+
+      def counter_key
+        "#{queue_key}:counter"
       end
 
       def queue_key
