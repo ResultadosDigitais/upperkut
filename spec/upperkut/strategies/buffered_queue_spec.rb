@@ -81,9 +81,80 @@ module Upperkut
       describe '#clear' do
         it 'deletes the queue' do
           strategy.push_items(['event' => 'open'])
-          expect do
-            strategy.clear
-          end.to change { strategy.metrics['size'] }.from(1).to(0)
+
+          expect { strategy.clear }.to change { strategy.metrics['size'] }.from(1).to(0)
+        end
+      end
+
+      describe '#ack' do
+        before do
+          travel_to(Time.parse('2015-01-01 00:00:00'))
+
+          strategy.push_items([
+            { 'event' => 'open' },
+            { 'event' => 'click' }
+          ])
+        end
+
+        it 'remove items from processing queue' do
+          items = []
+          fetched_items = strategy.fetch_items
+          items << fetched_items.map(&:body)
+
+          travel_to(Time.parse('2015-01-01 00:00:10'))
+          strategy.ack([ fetched_items.first ])
+          items << strategy.fetch_items.map(&:body)
+
+          travel_to(Time.parse('2015-01-01 00:01:00'))
+          items << strategy.fetch_items.map(&:body)
+
+          expect(items).to eq([
+            [{ 'event' => 'open' }, { 'event' => 'click' }],
+            [],
+            [{ 'event' => 'click' }]
+          ])
+        end
+
+        it 'does not move items back to the queue' do
+          items = strategy.fetch_items
+
+          expect { strategy.ack(items) }.not_to change { strategy.metrics['size'] }.from(0)
+        end
+      end
+
+      describe '#nack' do
+        before do
+          travel_to(Time.parse('2015-01-01 00:00:00'))
+
+          strategy.push_items([
+            { 'event' => 'open' },
+            { 'event' => 'click' }
+          ])
+        end
+
+        it 'remove items from processing queue' do
+          items = []
+          fetched_items = strategy.fetch_items
+          items << fetched_items.map(&:body)
+
+          travel_to(Time.parse('2015-01-01 00:00:10'))
+          strategy.nack([ fetched_items.first ])
+          items << strategy.fetch_items.map(&:body)
+
+          travel_to(Time.parse('2015-01-01 00:01:00'))
+          items << strategy.fetch_items.map(&:body)
+
+          expect(items).to eq([
+            [{ 'event' => 'open' }, { 'event' => 'click' }],
+            [{ 'event' => 'open' }],
+            [{ 'event' => 'click' }]
+          ])
+        end
+
+        it 'add items back on the queue' do
+          items = strategy.fetch_items
+
+          expect { strategy.nack(items) }.to change { strategy.metrics['size'] }.from(0).to(2)
         end
       end
 

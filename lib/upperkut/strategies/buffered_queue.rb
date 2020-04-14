@@ -7,7 +7,7 @@ module Upperkut
     class BufferedQueue < Upperkut::Strategies::Base
       include Upperkut::Util
 
-      DEQUEUE_ITEM = %(
+      DEQUEUE_ITEMS = %(
         local key = KEYS[1]
         local waiting_ack_key = KEYS[2]
         local batch_size = ARGV[1]
@@ -31,6 +31,26 @@ module Upperkut
         redis.call("LTRIM", key, batch_size, -1)
 
         return items
+      ).freeze
+
+      ACK_ITEMS = %(
+        local waiting_ack_key = KEYS[1]
+        local items = ARGV
+
+        for i, item in ipairs(items) do
+          redis.call("ZREM", waiting_ack_key, item)
+        end
+      ).freeze
+
+      NACK_ITEMS = %(
+        local key = KEYS[1]
+        local waiting_ack_key = KEYS[2]
+        local items = ARGV
+
+        for i, item in ipairs(items) do
+          redis.call("ZREM", waiting_ack_key, item)
+          redis.call("RPUSH", key, item)
+        end
       ).freeze
 
       attr_reader :options
@@ -73,7 +93,7 @@ module Upperkut
         batch_size = [@batch_size, size].min
 
         items = redis do |conn|
-          conn.eval(DEQUEUE_ITEM,
+          conn.eval(DEQUEUE_ITEMS,
                     keys: [key, processing_key],
                     argv: [batch_size, Time.now.utc.to_i, Time.now.utc.to_i - @ack_wait_limit])
         end
@@ -85,10 +105,24 @@ module Upperkut
         redis { |conn| conn.del(key) }
       end
 
-      def ack(_items); end
+      def ack(items);
+        raise ArgumentError, 'Invalid item' unless items.all?(Item)
+
+        redis do |conn|
+          conn.eval(ACK_ITEMS,
+                    keys: [processing_key],
+                    argv: items.map(&:to_json))
+        end
+      end
 
       def nack(items)
-        push_items(items)
+        raise ArgumentError, 'Invalid item' unless items.all?(Item)
+
+        redis do |conn|
+          conn.eval(NACK_ITEMS,
+                    keys: [key, processing_key],
+                    argv: items.map(&:to_json))
+        end
       end
 
       def process?
