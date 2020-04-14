@@ -3,7 +3,13 @@ require 'upperkut/item'
 
 module Upperkut
   RSpec.describe Item do
-    subject(:item) { described_class.new({ my_property: 1 }, current_timestamp) }
+    subject(:item) do
+      described_class.new(
+        id: 'my-unique-id',
+        enqueued_at: current_timestamp,
+        body: { my_property: 1 },
+      )
+    end
 
     let(:current_timestamp) { Time.now.utc.to_i }
 
@@ -26,7 +32,7 @@ module Upperkut
     describe '#body' do
       subject(:body) { item.body }
 
-      it { is_expected.to eq({ my_property: 1 }) }
+      it { is_expected.to eq({ 'my_property' => 1 }) }
     end
 
     describe '#enqueued_at' do
@@ -40,7 +46,8 @@ module Upperkut
 
       it do
         expected_hash = {
-          body: { my_property: 1 },
+          id: 'my-unique-id',
+          body: { 'my_property' => 1 },
           enqueued_at: current_timestamp,
         }
 

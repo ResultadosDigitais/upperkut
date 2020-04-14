@@ -27,7 +27,7 @@ module Upperkut
       items.map do |item|
         next item if item.is_a?(Item)
 
-        Item.new(item)
+        Item.new(body: item)
       end
     end
 

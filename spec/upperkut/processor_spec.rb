@@ -113,7 +113,7 @@ module Upperkut
           end
 
           it 'keeps the same latency' do
-            item = Item.new({ 'id' => '1', 'event' => 'open' }, 2)
+            item = Item.new(body: { 'id' => '1', 'event' => 'open' }, enqueued_at: 2)
             worker.push_items(item)
 
             expect {

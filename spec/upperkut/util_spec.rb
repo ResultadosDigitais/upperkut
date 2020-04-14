@@ -24,7 +24,7 @@ module Upperkut
       end
 
       it 'knows how to handle an Item class' do
-        items = Item.new('my_property' => 1)
+        items = Item.new(body: { 'my_property' => 1 })
         normalized_items = normalize_items([ items ])
 
         expect(normalized_items.map(&:body)).to eq(
@@ -33,7 +33,7 @@ module Upperkut
       end
 
       it 'knows how to handle a single Item class' do
-        items = Item.new('my_property' => 1)
+        items = Item.new(body: { 'my_property' => 1 })
         normalized_items = normalize_items(items)
 
         expect(normalized_items.map(&:body)).to eq(
