@@ -106,7 +106,7 @@ module Upperkut
       end
 
       def ack(items)
-        raise ArgumentError, 'Invalid item' unless items.all?(Item)
+        raise ArgumentError, 'Invalid item' unless items.all? { |item| item.is_a?(Item) }
 
         redis do |conn|
           conn.eval(ACK_ITEMS,
@@ -116,7 +116,7 @@ module Upperkut
       end
 
       def nack(items)
-        raise ArgumentError, 'Invalid item' unless items.all?(Item)
+        raise ArgumentError, 'Invalid item' unless items.all? { |item| item.is_a?(Item) }
 
         redis do |conn|
           conn.eval(NACK_ITEMS,
