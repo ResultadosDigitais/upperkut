@@ -5,7 +5,9 @@ require 'time'
 module Upperkut
   module Strategies
     RSpec.describe BufferedQueue do
-      subject(:strategy) { described_class.new(DummyWorker) }
+      subject(:strategy) { described_class.new(DummyWorker, options) }
+
+      let(:options) { { ack_wait_limit: 60 } }
 
       # DummyWorker class to use in tests
       class DummyWorker
