@@ -53,6 +53,27 @@ module Upperkut
 
           expect(items).to eq([{ 'event' => 'open' }, { 'event' => 'click' }])
         end
+
+        it 'fetches old unacknowledged items' do
+          items = []
+
+          travel_to(Time.parse('2015-01-01 00:00:00'))
+          strategy.push_items({ 'event' => 'open' })
+          strategy.push_items({ 'event' => 'open' })
+          items << strategy.fetch_items.map(&:body)
+
+          travel_to(Time.parse('2015-01-01 00:00:10'))
+          items << strategy.fetch_items.map(&:body)
+
+          travel_to(Time.parse('2015-01-01 00:01:10'))
+          items << strategy.fetch_items.map(&:body)
+
+          expect(items).to eq([
+            [{ 'event' => 'open' }, { 'event' => 'open' }],
+            [],
+            [{ 'event' => 'open' }, { 'event' => 'open' }]
+          ])
+        end
       end
 
       describe '#clear' do
