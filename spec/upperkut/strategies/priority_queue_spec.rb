@@ -66,6 +66,23 @@ module Upperkut
         end
       end
 
+      describe '#nack' do
+        before do
+          travel_to(Time.parse('2015-01-01 00:00:00'))
+
+          strategy.push_items([
+            { 'event' => 'open' },
+            { 'event' => 'click' }
+          ])
+        end
+
+        it 'add items back on the queue' do
+          items = strategy.fetch_items
+
+          expect { strategy.nack(items) }.to change { strategy.metrics['size'] }.from(0).to(2)
+        end
+      end
+
       describe '#metrics' do
         it 'returns the number of items to be processed' do
           strategy.push_items([
