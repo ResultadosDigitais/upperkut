@@ -7,7 +7,7 @@ module Upperkut
       described_class.new(
         id: 'my-unique-id',
         enqueued_at: current_timestamp,
-        body: { my_property: 1 },
+        body: { 'my_property' => 1 },
       )
     end
 

@@ -7,8 +7,8 @@ module Upperkut
     def initialize(body:, id: nil, enqueued_at: nil)
       raise ArgumentError, 'Body should be a Hash' unless body.is_a?(Hash)
 
+      @body = body
       @id = id || SecureRandom.uuid
-      @body = body.transform_keys(&:to_s)
       @enqueued_at = enqueued_at || Time.now.utc.to_i
     end
 
@@ -33,8 +33,9 @@ module Upperkut
     end
 
     def self.from_json(item_json)
-      hash = JSON.parse(item_json, symbolize_names: true)
-      new(hash.slice(:id, :body, :enqueued_at))
+      hash = JSON.parse(item_json)
+      id, body, enqueued_at = hash.values_at('id', 'body', 'enqueued_at')
+      new(id: id, body: body, enqueued_at: enqueued_at)
     end
   end
 end
