@@ -5,6 +5,10 @@ require 'time'
 module Upperkut
   module Strategies
     RSpec.describe BufferedQueue do
+      subject(:strategy) { described_class.new(DummyWorker, options) }
+
+      let(:options) { { ack_wait_limit: 60 } }
+
       # DummyWorker class to use in tests
       class DummyWorker
         include Upperkut::Worker
@@ -14,13 +18,11 @@ module Upperkut
         end
       end
 
-      subject(:strategy) { described_class.new(DummyWorker) }
-
       before do
         strategy.clear
       end
 
-      describe '.push_items' do
+      describe '#push_items' do
         it 'insert items in the queue' do
           expect do
             strategy.push_items([{ 'event' => 'open' }, { 'event' => 'click' }])
@@ -45,7 +47,7 @@ module Upperkut
         end
       end
 
-      describe '.fetch_items' do
+      describe '#fetch_items' do
         it 'returns the head items off queue' do
           strategy.push_items([{ 'event' => 'open' }, { 'event' => 'click' }])
 
@@ -53,28 +55,119 @@ module Upperkut
 
           expect(items).to eq([{ 'event' => 'open' }, { 'event' => 'click' }])
         end
-      end
 
-      describe '.latency' do
-        it 'returns correct latency' do
-          allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:00'))
-          strategy.push_items('event' => 'open', 'k' => 1)
+        it 'fetches old unacknowledged items' do
+          items = []
 
-          allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:04'))
-          strategy.push_items('event' => 'open', 'k' => 1)
+          travel_to(Time.parse('2015-01-01 00:00:00'))
+          strategy.push_items({ 'event' => 'open' })
+          strategy.push_items({ 'event' => 'open' })
+          items << strategy.fetch_items.map(&:body)
 
-          allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:10'))
+          travel_to(Time.parse('2015-01-01 00:00:10'))
+          items << strategy.fetch_items.map(&:body)
 
-          expect(strategy.metrics['latency']).to eq 10.0
+          travel_to(Time.parse('2015-01-01 00:01:10'))
+          items << strategy.fetch_items.map(&:body)
+
+          expect(items).to eq([
+            [{ 'event' => 'open' }, { 'event' => 'open' }],
+            [],
+            [{ 'event' => 'open' }, { 'event' => 'open' }]
+          ])
         end
       end
 
-      describe '.clear' do
+      describe '#clear' do
         it 'deletes the queue' do
           strategy.push_items(['event' => 'open'])
-          expect do
-            strategy.clear
-          end.to change { strategy.metrics['size'] }.from(1).to(0)
+
+          expect { strategy.clear }.to change { strategy.metrics['size'] }.from(1).to(0)
+        end
+      end
+
+      describe '#ack' do
+        before do
+          travel_to(Time.parse('2015-01-01 00:00:00'))
+
+          strategy.push_items([
+            { 'event' => 'open' },
+            { 'event' => 'click' }
+          ])
+        end
+
+        it 'remove items from processing queue' do
+          items = []
+          fetched_items = strategy.fetch_items
+          items << fetched_items.map(&:body)
+
+          travel_to(Time.parse('2015-01-01 00:00:10'))
+          strategy.ack([ fetched_items.first ])
+          items << strategy.fetch_items.map(&:body)
+
+          travel_to(Time.parse('2015-01-01 00:01:00'))
+          items << strategy.fetch_items.map(&:body)
+
+          expect(items).to eq([
+            [{ 'event' => 'open' }, { 'event' => 'click' }],
+            [],
+            [{ 'event' => 'click' }]
+          ])
+        end
+
+        it 'does not move items back to the queue' do
+          items = strategy.fetch_items
+
+          expect { strategy.ack(items) }.not_to change { strategy.metrics['size'] }.from(0)
+        end
+      end
+
+      describe '#nack' do
+        before do
+          travel_to(Time.parse('2015-01-01 00:00:00'))
+
+          strategy.push_items([
+            { 'event' => 'open' },
+            { 'event' => 'click' }
+          ])
+        end
+
+        it 'remove items from processing queue' do
+          items = []
+          fetched_items = strategy.fetch_items
+          items << fetched_items.map(&:body)
+
+          travel_to(Time.parse('2015-01-01 00:00:10'))
+          strategy.nack([ fetched_items.first ])
+          items << strategy.fetch_items.map(&:body)
+
+          travel_to(Time.parse('2015-01-01 00:01:00'))
+          items << strategy.fetch_items.map(&:body)
+
+          expect(items).to eq([
+            [{ 'event' => 'open' }, { 'event' => 'click' }],
+            [{ 'event' => 'open' }],
+            [{ 'event' => 'click' }]
+          ])
+        end
+
+        it 'add items back on the queue' do
+          items = strategy.fetch_items
+
+          expect { strategy.nack(items) }.to change { strategy.metrics['size'] }.from(0).to(2)
+        end
+      end
+
+      describe '#metrics' do
+        it 'returns correct latency' do
+          travel_to(Time.parse('2015-01-01 00:00:00'))
+          strategy.push_items('event' => 'open', 'k' => 1)
+
+          travel_to(Time.parse('2015-01-01 00:00:04'))
+          strategy.push_items('event' => 'open', 'k' => 1)
+
+          travel_to(Time.parse('2015-01-01 00:00:10'))
+          expect(strategy.metrics['latency']).to eq 10.0
         end
       end
     end

@@ -70,6 +70,12 @@ module Upperkut
         redis { |conn| conn.del(key) }
       end
 
+      def ack(_items); end
+
+      def nack(items)
+        push_items(items)
+      end
+
       def metrics
         {
           'latency' => latency,

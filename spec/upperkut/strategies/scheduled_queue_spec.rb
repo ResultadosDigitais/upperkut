@@ -16,7 +16,7 @@ module Upperkut
         strategy.clear
       end
 
-      describe '.push_items' do
+      describe '#push_items' do
         describe 'when there is no item to push' do
           it 'returns false' do
             expect( strategy.push_items ).to be(false)
@@ -54,7 +54,7 @@ module Upperkut
         end
       end
 
-      describe '.fetch_items' do
+      describe '#fetch_items' do
         context 'when the queue is empty' do
           it 'returns empty array' do
             expect(strategy.fetch_items).to eq([])
@@ -70,11 +70,11 @@ module Upperkut
                  { 'event' => 'click', 'timestamp' => timestamp }]
               )
               items = strategy.fetch_items
-              
+
               expect(items).to eq([])
             end
           end
-  
+
           context 'when there are items to pull now and in the future' do
             it 'returns only the present items' do
               timestamp = Time.new(2200).to_i
@@ -83,7 +83,7 @@ module Upperkut
                  { 'event' => 'click', 'timestamp' => timestamp }]
               )
               items = strategy.fetch_items
-              
+
               expect(items.count).to eq(1)
             end
           end
@@ -100,7 +100,7 @@ module Upperkut
                 { 'event' => 'write'},]
               )
               items = strategy.fetch_items
-              
+
               expect(items.count).to eq(2)
             end
           end
@@ -117,14 +117,40 @@ module Upperkut
                 { 'event' => 'write'},]
               )
               items = strategy.fetch_items
-              
+
               expect(items.count).to eq(4)
             end
           end
         end
       end
 
-      describe '.latency' do
+      describe '#clear' do
+        it 'deletes the queue' do
+          strategy.push_items(['event' => 'open'])
+          expect do
+            strategy.clear
+          end.to change { strategy.metrics['size'] }.from(1).to(0)
+        end
+      end
+
+      describe '#nack' do
+        before do
+          travel_to(Time.parse('2015-01-01 00:00:00'))
+
+          strategy.push_items([
+            { 'event' => 'open' },
+            { 'event' => 'click' }
+          ])
+        end
+
+        it 'add items back on the queue' do
+          items = strategy.fetch_items
+
+          expect { strategy.nack(items) }.to change { strategy.metrics['size'] }.from(0).to(2)
+        end
+      end
+
+      describe '#metrics' do
         it 'returns correct latency' do
           allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:00'))
           strategy.push_items('event' => 'open', 'k' => 1)
@@ -135,15 +161,6 @@ module Upperkut
           allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:10'))
 
           expect(strategy.metrics['latency']).to eq 10.0
-        end
-      end
-
-      describe '.clear' do
-        it 'deletes the queue' do
-          strategy.push_items(['event' => 'open'])
-          expect do
-            strategy.clear
-          end.to change { strategy.metrics['size'] }.from(1).to(0)
         end
       end
     end

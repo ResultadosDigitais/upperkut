@@ -139,6 +139,12 @@ module Upperkut
         redis { |conn| conn.del(queue_key) }
       end
 
+      def ack(_items); end
+
+      def nack(items)
+        push_items(items)
+      end
+
       # Public: Tells when to execute the event processing,
       # when this condition is met so the events are dispatched to
       # the worker.

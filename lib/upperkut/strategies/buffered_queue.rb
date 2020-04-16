@@ -7,13 +7,65 @@ module Upperkut
     class BufferedQueue < Upperkut::Strategies::Base
       include Upperkut::Util
 
+      DEQUEUE_ITEMS = %(
+        local key = KEYS[1]
+        local waiting_ack_key = KEYS[2]
+        local batch_size = ARGV[1]
+        local current_timestamp = ARGV[2]
+        local expired_ack_timestamp = ARGV[3] + 1
+
+        -- move expired items back to the queue
+        local expired_ack_items = redis.call("ZRANGEBYSCORE", waiting_ack_key, 0, expired_ack_timestamp)
+        if table.getn(expired_ack_items) > 0 then
+          redis.call("ZREMRANGEBYSCORE", waiting_ack_key, 0, expired_ack_timestamp)
+          for i, item in ipairs(expired_ack_items) do
+            redis.call("RPUSH", key, item)
+          end
+        end
+
+        -- now fetch a batch
+        local items = redis.call("LRANGE", key, 0, batch_size - 1)
+        for i, item in ipairs(items) do
+          redis.call("ZADD", waiting_ack_key, current_timestamp + tonumber('0.' .. i), item)
+        end
+        redis.call("LTRIM", key, batch_size, -1)
+
+        return items
+      ).freeze
+
+      ACK_ITEMS = %(
+        local waiting_ack_key = KEYS[1]
+        local items = ARGV
+
+        for i, item in ipairs(items) do
+          redis.call("ZREM", waiting_ack_key, item)
+        end
+      ).freeze
+
+      NACK_ITEMS = %(
+        local key = KEYS[1]
+        local waiting_ack_key = KEYS[2]
+        local items = ARGV
+
+        for i, item in ipairs(items) do
+          redis.call("ZREM", waiting_ack_key, item)
+          redis.call("RPUSH", key, item)
+        end
+      ).freeze
+
       attr_reader :options
 
       def initialize(worker, options = {})
         @options = options
         @redis_options = options.fetch(:redis, {})
-        @worker     = worker
-        @max_wait   = options.fetch(
+        @worker = worker
+
+        @ack_wait_limit = options.fetch(
+          :ack_wait_limit,
+          60
+        )
+
+        @max_wait = options.fetch(
           :max_wait,
           Integer(ENV['UPPERKUT_MAX_WAIT'] || 20)
         )
@@ -38,12 +90,12 @@ module Upperkut
       end
 
       def fetch_items
-        stop = [@batch_size, size].min
+        batch_size = [@batch_size, size].min
 
         items = redis do |conn|
-          conn.multi do
-            stop.times { conn.lpop(key) }
-          end
+          conn.eval(DEQUEUE_ITEMS,
+                    keys: [key, processing_key],
+                    argv: [batch_size, Time.now.utc.to_i, Time.now.utc.to_i - @ack_wait_limit])
         end
 
         decode_json_items(items)
@@ -53,11 +105,24 @@ module Upperkut
         redis { |conn| conn.del(key) }
       end
 
-      def metrics
-        {
-          'latency' => latency,
-          'size' => size
-        }
+      def ack(items)
+        raise ArgumentError, 'Invalid item' unless items.all? { |item| item.is_a?(Item) }
+
+        redis do |conn|
+          conn.eval(ACK_ITEMS,
+                    keys: [processing_key],
+                    argv: items.map(&:to_json))
+        end
+      end
+
+      def nack(items)
+        raise ArgumentError, 'Invalid item' unless items.all? { |item| item.is_a?(Item) }
+
+        redis do |conn|
+          conn.eval(NACK_ITEMS,
+                    keys: [key, processing_key],
+                    argv: items.map(&:to_json))
+        end
       end
 
       def process?
@@ -72,10 +137,21 @@ module Upperkut
         end
       end
 
+      def metrics
+        {
+          'latency' => latency,
+          'size' => size
+        }
+      end
+
       private
 
       def key
         "upperkut:buffers:#{to_underscore(@worker.name)}"
+      end
+
+      def processing_key
+        "#{key}:processing"
       end
 
       def fulfill_condition?(buff_size)

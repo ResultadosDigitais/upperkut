@@ -3,6 +3,7 @@ require 'simplecov'
 require 'redis'
 require 'pry'
 require 'upperkut'
+require_relative 'helpers'
 
 # Set default REDIS_URL environment variable
 ENV['REDIS_URL'] = 'redis://localhost'
@@ -17,10 +18,11 @@ RSpec.configure do |config|
   config.disable_monkey_patching!
 
   redis = Redis.new(url: ENV['REDIS_URL'])
-
   config.before(:each) { redis.flushdb }
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.include Helpers
 end
