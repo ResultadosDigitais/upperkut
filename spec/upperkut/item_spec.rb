@@ -41,6 +41,22 @@ module Upperkut
       it { is_expected.to eq(current_timestamp) }
     end
 
+    describe '#key?' do
+      subject { item.key?(key) }
+
+      context 'when the key is present in the body' do
+        let(:key) { 'my_property' }
+
+        it { is_expected.to be_truthy }
+      end
+
+      context 'when the key is not present in the body' do
+        let(:key) { 'my_inexistent_property' }
+
+        it { is_expected.to be_falsey }
+      end
+    end
+
     describe '#to_json' do
       subject { item.to_json }
 
