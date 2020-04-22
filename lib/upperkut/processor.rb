@@ -13,7 +13,7 @@ module Upperkut
       items = @worker.fetch_items.freeze
 
       @worker.server_middlewares.invoke(@worker, items) do
-        @worker_instance.perform(items)
+        @worker_instance.perform(items.map(&:dup))
       end
 
       @strategy.ack(items)
