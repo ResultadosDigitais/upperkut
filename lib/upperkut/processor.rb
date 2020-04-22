@@ -13,10 +13,11 @@ module Upperkut
       items = @worker.fetch_items.freeze
 
       @worker.server_middlewares.invoke(@worker, items) do
-        @worker_instance.perform(items.map(&:dup))
+        @worker_instance.perform(items)
       end
 
-      @strategy.ack(items)
+      pending_ack = items.reject(&:accepted?)
+      @strategy.ack(pending_ack)
     rescue StandardError => error
       @logger.error(
         action: :handle_execution_error,
@@ -31,7 +32,8 @@ module Upperkut
           return
         end
 
-        @strategy.nack(items)
+        pending_ack = items.reject(&:accepted?)
+        @strategy.nack(pending_ack)
       end
 
       raise error
