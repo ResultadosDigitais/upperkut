@@ -11,10 +11,9 @@ module Upperkut
 
     def process
       items = @worker.fetch_items.freeze
-      items_body = items.map(&:body)
 
       @worker.server_middlewares.invoke(@worker, items) do
-        @worker_instance.perform(items_body.dup)
+        @worker_instance.perform(items.map(&:dup))
       end
 
       @strategy.ack(items)
@@ -28,7 +27,7 @@ module Upperkut
 
       if items
         if @worker_instance.respond_to?(:handle_error)
-          @worker_instance.handle_error(error, items_body)
+          @worker_instance.handle_error(error, items)
           return
         end
 
