@@ -31,12 +31,19 @@ module Upperkut
     end
 
     describe '#process' do
-      it 'acknowledges performed items' do
-        item = { 'id' => '1', 'event' => 'open' }
-        worker.push_items(item)
+      before do
+        allow_any_instance_of(worker).to receive(:perform) do |_instance, items|
+          items.select { |item| item['event'] == 'will_ack' }.each(&:ack)
+        end
+      end
+
+      it 'acknowledges performed and not accepted items' do
+        item_1 = { 'id' => '1', 'event' => 'open' }
+        item_2 = { 'id' => '2', 'event' => 'will_ack' }
+        worker.push_items([ item_1, item_2 ])
 
         expect { processor.process }.to change { strategy.acked }.to([
-          an_object_having_attributes(body: item)
+          an_object_having_attributes(body: item_1)
         ])
       end
 
@@ -64,15 +71,19 @@ module Upperkut
 
       context 'when something goes wrong while processing' do
         before do
-          allow_any_instance_of(worker).to receive(:perform).and_raise(ArgumentError)
+          allow_any_instance_of(worker).to receive(:perform) do |_instance, items|
+            items.select { |item| item['event'] == 'will_nack' }.each(&:nack)
+            raise ArgumentError
+          end
         end
 
-        it 'mark items as not-acknowledged' do
-          item = { 'id' => '1', 'event' => 'open' }
-          worker.push_items(item)
+        it 'mark not accepted items as not-acknowledged' do
+          item_1 = { 'id' => '1', 'event' => 'open' }
+          item_2 = { 'id' => '2', 'event' => 'will_nack' }
+          worker.push_items([ item_1, item_2 ])
 
           expect { processor.process }.to change { strategy.nacked }.to([
-            an_object_having_attributes(body: item)
+            an_object_having_attributes(body: item_1)
           ]).and raise_error(ArgumentError)
         end
 
