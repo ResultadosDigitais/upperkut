@@ -2,6 +2,8 @@ require 'securerandom'
 
 module Upperkut
   class Item
+    class InvalidStateTransition < RuntimeError; end
+
     attr_reader :id, :body, :enqueued_at
 
     def initialize(body:, id: nil, enqueued_at: nil)
@@ -10,6 +12,7 @@ module Upperkut
       @body = body
       @id = id || SecureRandom.uuid
       @enqueued_at = enqueued_at || Time.now.utc.to_i
+      @nacked = false
     end
 
     def [](key)
@@ -22,6 +25,28 @@ module Upperkut
 
     def key?(key)
       @body.key?(key)
+    end
+
+    def ack
+      raise InvalidStateTransition, 'Item was already accepted' if accepted?
+      @acked = true
+    end
+
+    def acked?
+      @acked
+    end
+
+    def nack
+      raise InvalidStateTransition, 'Item was already accepted' if accepted?
+      @nacked = true
+    end
+
+    def nacked?
+      @nacked
+    end
+
+    def accepted?
+      acked? || nacked?
     end
 
     def to_json
