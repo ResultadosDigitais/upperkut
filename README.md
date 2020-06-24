@@ -42,7 +42,7 @@ Or install it yourself as:
 
 2) Start pushing items;
   ```ruby
-  Myworker.push_items(
+  MyWorker.push_items(
     [
       {
         'id' => SecureRandom.uuid,
@@ -80,7 +80,7 @@ Or install it yourself as:
 2) Start pushing items with `timestamp` parameter;
   ```ruby
   # timestamp is 'Thu, 10 May 2019 23:43:58 GMT'
-  Myworker.push_items(
+  MyWorker.push_items(
     [
       {
         'timestamp' => '1557531838',
