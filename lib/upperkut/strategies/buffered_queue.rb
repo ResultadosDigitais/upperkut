@@ -62,7 +62,7 @@ module Upperkut
 
         @ack_wait_limit = options.fetch(
           :ack_wait_limit,
-          60
+          Integer(ENV['UPPERKUT_ACK_WAIT_LIMIT'] || 120)
         )
 
         @max_wait = options.fetch(
