@@ -163,7 +163,7 @@ module Upperkut
 
       def oldest_item_age
         oldest_processing_item = redis do |conn|
-          items = redis.zrange(processing_key, 0, 0)
+          items = conn.zrange(processing_key, 0, 0)
           decode_json_items(items).first
         end
 
