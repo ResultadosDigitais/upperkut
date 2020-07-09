@@ -138,9 +138,11 @@ module Upperkut
       end
 
       def metrics
+        current_latency = latency
+
         {
-          'latency' => latency,
-          'oldest_unacked_item_age' => oldest_item_age,
+          'latency' => current_latency,
+          'oldest_unacked_item_age' => oldest_item_age(current_latency),
           'size' => size
         }
       end
@@ -161,7 +163,7 @@ module Upperkut
         buff_size >= @batch_size || @waiting_time >= @max_wait
       end
 
-      def oldest_item_age
+      def oldest_item_age(current_latency)
         oldest_processing_item = redis do |conn|
           items = conn.zrange(processing_key, 0, 0)
           decode_json_items(items).first
@@ -174,7 +176,7 @@ module Upperkut
                                   0
                                 end
 
-        [latency, oldest_processing_age].max
+        [current_latency, oldest_processing_age].max
       end
 
       def latency
