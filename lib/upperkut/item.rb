@@ -27,26 +27,12 @@ module Upperkut
       @body.key?(key)
     end
 
-    def ack
-      raise InvalidStateTransition, 'Item was already accepted' if accepted?
-      @acked = true
-    end
-
-    def acked?
-      @acked
-    end
-
     def nack
-      raise InvalidStateTransition, 'Item was already accepted' if accepted?
       @nacked = true
     end
 
     def nacked?
       @nacked
-    end
-
-    def accepted?
-      acked? || nacked?
     end
 
     def to_json
