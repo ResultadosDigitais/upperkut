@@ -16,8 +16,9 @@ module Upperkut
         @worker_instance.perform(items)
       end
 
-      pending_ack = items.reject(&:accepted?)
-      @strategy.ack(pending_ack)
+      nacked_items, pending_ack_items = items.partition(&:nacked?)
+      @strategy.nack(nacked_items) if nacked_items.any?
+      @strategy.ack(pending_ack_items) if pending_ack_items.any?
     rescue StandardError => error
       @logger.error(
         action: :handle_execution_error,
@@ -32,8 +33,7 @@ module Upperkut
           return
         end
 
-        pending_ack = items.reject(&:accepted?)
-        @strategy.nack(pending_ack)
+        @strategy.nack(items)
       end
 
       raise error

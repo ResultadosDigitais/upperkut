@@ -33,14 +33,16 @@ module Upperkut
     describe '#process' do
       before do
         allow_any_instance_of(worker).to receive(:perform) do |_instance, items|
-          items.select { |item| item['event'] == 'will_ack' }.each(&:ack)
+          items.select { |item| item['event'] == 'will_ack' }
         end
       end
 
-      it 'acknowledges performed and not accepted items' do
+      it 'acknowledges performed and not-acknowledged items' do
         item_1 = { 'id' => '1', 'event' => 'open' }
-        item_2 = { 'id' => '2', 'event' => 'will_ack' }
+        item_2 = Item.new(body: { 'id' => '2', 'event' => 'will_ack' })
         worker.push_items([ item_1, item_2 ])
+
+        item_2.nack
 
         expect { processor.process }.to change { strategy.acked }.to([
           an_object_having_attributes(body: item_1)
@@ -77,13 +79,14 @@ module Upperkut
           end
         end
 
-        it 'mark not accepted items as not-acknowledged' do
+        it 'mark items as not-acknowledged' do
           item_1 = { 'id' => '1', 'event' => 'open' }
           item_2 = { 'id' => '2', 'event' => 'will_nack' }
           worker.push_items([ item_1, item_2 ])
 
           expect { processor.process }.to change { strategy.nacked }.to([
-            an_object_having_attributes(body: item_1)
+            an_object_having_attributes(body: item_1),
+            an_object_having_attributes(body: item_2)
           ]).and raise_error(ArgumentError)
         end
 
