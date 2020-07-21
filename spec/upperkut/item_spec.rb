@@ -61,14 +61,6 @@ module Upperkut
       it 'marks a item as acknowledged' do
         expect { item.nack }.to change { item.nacked? }.to(true)
       end
-
-      context 'when the item was previously nacked' do
-        before { item.nack }
-
-        it 'raises an error' do
-          expect { item.nack }.to raise_error(described_class::InvalidStateTransition)
-        end
-      end
     end
 
     describe '#nacked?' do

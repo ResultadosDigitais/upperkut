@@ -2,8 +2,6 @@ require 'securerandom'
 
 module Upperkut
   class Item
-    class InvalidStateTransition < RuntimeError; end
-
     attr_reader :id, :body, :enqueued_at
 
     def initialize(body:, id: nil, enqueued_at: nil)
