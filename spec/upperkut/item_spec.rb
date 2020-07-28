@@ -57,74 +57,14 @@ module Upperkut
       end
     end
 
-    describe '#ack' do
-      it 'marks a item as acknowledged' do
-        expect { item.ack }.to change { item.acked? }.to(true)
-      end
-
-      context 'when the item was previously nacked' do
-        before { item.ack }
-
-        it 'raises an error' do
-          expect { item.ack }.to raise_error(described_class::InvalidStateTransition)
-        end
-      end
-    end
-
-    describe '#acked?' do
-      subject { item.acked? }
-
-      context 'when the item is not nacked' do
-        it { is_expected.to be_falsey }
-      end
-
-      context 'when the item is nacked' do
-        before { item.ack }
-
-        it { is_expected.to be_truthy }
-      end
-    end
-
     describe '#nack' do
       it 'marks a item as acknowledged' do
         expect { item.nack }.to change { item.nacked? }.to(true)
-      end
-
-      context 'when the item was previously nacked' do
-        before { item.nack }
-
-        it 'raises an error' do
-          expect { item.nack }.to raise_error(described_class::InvalidStateTransition)
-        end
       end
     end
 
     describe '#nacked?' do
       subject { item.nacked? }
-
-      context 'when the item is not nacked' do
-        it { is_expected.to be_falsey }
-      end
-
-      context 'when the item is nacked' do
-        before { item.nack }
-
-        it { is_expected.to be_truthy }
-      end
-    end
-
-    describe '#accepted?' do
-      subject { item.accepted? }
-
-      context 'when the item is not acked' do
-        it { is_expected.to be_falsey }
-      end
-
-      context 'when the item is acked' do
-        before { item.ack }
-
-        it { is_expected.to be_truthy }
-      end
 
       context 'when the item is not nacked' do
         it { is_expected.to be_falsey }
