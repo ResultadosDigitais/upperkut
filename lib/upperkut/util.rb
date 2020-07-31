@@ -27,13 +27,28 @@ module Upperkut
       items.map do |item|
         next item if item.is_a?(Item)
 
-        Item.new(body: item)
+        Item.new(id: SecureRandom.uuid, body: item)
+      end
+    end
+
+    def encode_json_items(items)
+      items = [items] unless items.is_a?(Array)
+
+      items.map do |item|
+        JSON.generate(
+          'id' => item.id,
+          'body' => item.body,
+          'enqueued_at' => item.enqueued_at,
+        )
       end
     end
 
     def decode_json_items(items)
-      items.each_with_object([]) do |item, memo|
-        memo << Item.from_json(item) if item
+      items.each_with_object([]) do |item_json, memo|
+        next unless item_json
+
+        hash = JSON.parse(item_json, symbolize_names: true)
+        memo << Item.new(hash.slice(:id, :body, :enqueued_at))
       end
     end
 

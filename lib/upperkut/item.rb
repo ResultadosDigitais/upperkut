@@ -4,9 +4,9 @@ module Upperkut
   class Item
     attr_reader :id, :body, :enqueued_at
 
-    def initialize(body:, id: nil, enqueued_at: nil)
-      @body = body
-      @id = id || SecureRandom.uuid
+    def initialize(id:, body:, enqueued_at: nil)
+      @id = id
+      @body = body.transform_keys(&:to_s)
       @enqueued_at = enqueued_at || Time.now.utc.to_i
       @nacked = false
     end
