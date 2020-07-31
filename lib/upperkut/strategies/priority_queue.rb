@@ -112,7 +112,7 @@ module Upperkut
 
             conn.eval(ENQUEUE_ITEM,
                       keys: keys,
-                      argv: [item.to_json])
+                      argv: [encode_json_items(item)])
           end
         end
 
