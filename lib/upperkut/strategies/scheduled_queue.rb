@@ -134,6 +134,7 @@ module Upperkut
         end
 
         return timestamp - item.body['timestamp'].to_f if item
+
         0
       end
 
