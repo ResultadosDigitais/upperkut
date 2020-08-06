@@ -47,8 +47,9 @@ module Upperkut
       items.each_with_object([]) do |item_json, memo|
         next unless item_json
 
-        hash = JSON.parse(item_json, symbolize_names: true)
-        memo << Item.new(hash.slice(:id, :body, :enqueued_at))
+        hash = JSON.parse(item_json)
+        id, body, enqueued_at = hash.values_at('id', 'body', 'enqueued_at')
+        memo << Item.new(id: id, body: body, enqueued_at: enqueued_at)
       end
     end
 
