@@ -44,7 +44,8 @@ module Upperkut
         redis do |conn|
           items.each do |item|
             schedule_item = ensure_timestamp_attr(item)
-            conn.zadd(key, schedule_item.body['timestamp'], encode_json_items(schedule_item))
+            timestamp = schedule_item.body['timestamp']
+            conn.zadd(key, timestamp, encode_json_items(schedule_item))
           end
         end
 
