@@ -126,16 +126,14 @@ module Upperkut
       def latency
         now = Time.now.utc
         now_timestamp = now.to_f
-        item = nil
 
-        redis do |conn|
+        item = redis do |conn|
           item = conn.zrangebyscore(key, '-inf'.freeze, now_timestamp.to_s, limit: [0, 1]).first
-          item = decode_json_items([item]).first
+          decode_json_items([item]).first
         end
 
-        return 0 unless item
-
-        now_timestamp - item.body['timestamp'].to_f
+        return now_timestamp - item.body['timestamp'].to_f if item
+        0
       end
 
       def redis
