@@ -38,7 +38,7 @@ module Upperkut
         JSON.generate(
           'id' => item.id,
           'body' => item.body,
-          'enqueued_at' => item.enqueued_at,
+          'enqueued_at' => item.enqueued_at
         )
       end
     end
