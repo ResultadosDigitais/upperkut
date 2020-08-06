@@ -8,4 +8,4 @@ gemspec
 gem 'fivemat'
 gem 'pry'
 gem 'rspec_junit_formatter'
-gem 'simplecov', '~> 0.17', require: false
+gem 'simplecov', '< 0.18', require: false
