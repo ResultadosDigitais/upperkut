@@ -159,7 +159,6 @@ module Upperkut
           strategy.push_items('event' => 'open', 'k' => 1)
 
           allow(Time).to receive(:now).and_return(Time.parse('2015-01-01 00:00:10'))
-
           expect(strategy.metrics['latency']).to eq 10.0
         end
       end

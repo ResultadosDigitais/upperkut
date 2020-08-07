@@ -16,7 +16,7 @@ module Upperkut
 
       subject(:strategy) do
         options = {
-          priority_key: lambda { |item| item['tenant_id'] }
+          priority_key: lambda { |item| item.body['tenant_id'] }
         }
 
         described_class.new(DummyWorker, options)

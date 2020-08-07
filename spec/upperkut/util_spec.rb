@@ -24,7 +24,7 @@ module Upperkut
       end
 
       it 'knows how to handle an Item class' do
-        items = Item.new(body: { 'my_property' => 1 })
+        items = Item.new(id: '1', body: { 'my_property' => 1 })
         normalized_items = normalize_items([ items ])
 
         expect(normalized_items.map(&:body)).to eq(
@@ -33,7 +33,7 @@ module Upperkut
       end
 
       it 'knows how to handle a single Item class' do
-        items = Item.new(body: { 'my_property' => 1 })
+        items = Item.new(id: '1', body: { 'my_property' => 1 })
         normalized_items = normalize_items(items)
 
         expect(normalized_items.map(&:body)).to eq(
@@ -45,7 +45,7 @@ module Upperkut
     describe '#decode_json_items' do
       context 'when collection has nil values' do
         it 'rejects nil and preserve collection' do
-          items_json = [nil, nil, nil, '{"body":{"id":2,"name":"value"}}']
+          items_json = [nil, nil, nil, '{"id":"my-job","body":{"id":2,"name":"value"}}']
           items = decode_json_items(items_json).map(&:body)
 
           expect(items).to eq(

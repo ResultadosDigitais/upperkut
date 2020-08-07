@@ -33,13 +33,13 @@ module Upperkut
     describe '#process' do
       before do
         allow_any_instance_of(worker).to receive(:perform) do |_instance, items|
-          items.select { |item| item['event'] == 'will_ack' }
+          items.select { |item| item.body['event'] == 'will_ack' }
         end
       end
 
       it 'acknowledges performed and not-acknowledged items' do
         item_1 = { 'id' => '1', 'event' => 'open' }
-        item_2 = Item.new(body: { 'id' => '2', 'event' => 'will_ack' })
+        item_2 = Item.new(id: '1', body: { 'id' => '2', 'event' => 'will_ack' })
         worker.push_items([ item_1, item_2 ])
 
         item_2.nack
@@ -74,7 +74,7 @@ module Upperkut
       context 'when something goes wrong while processing' do
         before do
           allow_any_instance_of(worker).to receive(:perform) do |_instance, items|
-            items.select { |item| item['event'] == 'will_nack' }.each(&:nack)
+            items.select { |item| item.body['event'] == 'will_nack' }.each(&:nack)
             raise ArgumentError
           end
         end
@@ -115,7 +115,7 @@ module Upperkut
           end
 
           it 'keeps the same latency' do
-            item = Item.new(body: { 'id' => '1', 'event' => 'open' }, enqueued_at: 2)
+            item = Item.new(id: '1', body: { 'id' => '1', 'event' => 'open' }, enqueued_at: 2)
             worker.push_items(item)
 
             expect {

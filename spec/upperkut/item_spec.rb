@@ -13,12 +13,6 @@ module Upperkut
 
     let(:current_timestamp) { Time.now.utc.to_i }
 
-    it 'allows accessing body properties like a hash' do
-      item[:my_another_property] = 2
-
-      expect(item[:my_another_property]).to eq(2)
-    end
-
     describe '#initialize' do
       context 'when the enqueued at is not informed' do
         let(:current_timestamp) { nil }
@@ -41,22 +35,6 @@ module Upperkut
       it { is_expected.to eq(current_timestamp) }
     end
 
-    describe '#key?' do
-      subject { item.key?(key) }
-
-      context 'when the key is present in the body' do
-        let(:key) { 'my_property' }
-
-        it { is_expected.to be_truthy }
-      end
-
-      context 'when the key is not present in the body' do
-        let(:key) { 'my_inexistent_property' }
-
-        it { is_expected.to be_falsey }
-      end
-    end
-
     describe '#nack' do
       it 'marks a item as acknowledged' do
         expect { item.nack }.to change { item.nacked? }.to(true)
@@ -74,39 +52,6 @@ module Upperkut
         before { item.nack }
 
         it { is_expected.to be_truthy }
-      end
-    end
-
-    describe '#to_json' do
-      subject { item.to_json }
-
-      it do
-        expected_hash = {
-          id: 'my-unique-id',
-          body: { 'my_property' => 1 },
-          enqueued_at: current_timestamp,
-        }
-
-        is_expected.to eq(expected_hash.to_json)
-      end
-    end
-
-    describe '.from_json' do
-      subject(:unserialized_item) { described_class.from_json(item_json) }
-
-      let(:item_json) do
-        {
-          body: { my_property: 1 },
-          enqueued_at: current_timestamp,
-        }.to_json
-      end
-
-      it 'fetches the item body from the json' do
-        expect(unserialized_item.body).to eq({ 'my_property' => 1 })
-      end
-
-      it 'fetches the item enqueued_at from the json' do
-        expect(unserialized_item.enqueued_at).to eq(current_timestamp)
       end
     end
   end

@@ -83,7 +83,7 @@ module Upperkut
         return false if items.empty?
 
         redis do |conn|
-          conn.rpush(key, items.map(&:to_json))
+          conn.rpush(key, encode_json_items(items))
         end
 
         true
@@ -111,7 +111,7 @@ module Upperkut
         redis do |conn|
           conn.eval(ACK_ITEMS,
                     keys: [processing_key],
-                    argv: items.map(&:to_json))
+                    argv: encode_json_items(items))
         end
       end
 
@@ -121,7 +121,7 @@ module Upperkut
         redis do |conn|
           conn.eval(NACK_ITEMS,
                     keys: [key, processing_key],
-                    argv: items.map(&:to_json))
+                    argv: encode_json_items(items))
         end
       end
 

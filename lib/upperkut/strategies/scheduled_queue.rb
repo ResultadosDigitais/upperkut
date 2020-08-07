@@ -43,8 +43,9 @@ module Upperkut
 
         redis do |conn|
           items.each do |item|
-            ensure_timestamp_attr(item)
-            conn.zadd(key, item['timestamp'], item.to_json)
+            schedule_item = ensure_timestamp_attr(item)
+            timestamp = schedule_item.body['timestamp']
+            conn.zadd(key, timestamp, encode_json_items(schedule_item))
           end
         end
 
@@ -97,7 +98,13 @@ module Upperkut
       end
 
       def ensure_timestamp_attr(item)
-        item['timestamp'] = Time.now.utc.to_i unless item.key?('timestamp')
+        return item if item.body.key?('timestamp')
+
+        Item.new(
+          id: item.id,
+          body: item.body.merge('timestamp' => Time.now.utc.to_i),
+          enqueued_at: item.enqueued_at
+        )
       end
 
       def pop_values(redis_client, args)
@@ -119,17 +126,16 @@ module Upperkut
 
       def latency
         now = Time.now.utc
-        now_timestamp = now.to_f
-        job = nil
+        timestamp = now.to_f
 
-        redis do |conn|
-          job = conn.zrangebyscore(key, '-inf'.freeze, now_timestamp.to_s, limit: [0, 1]).first
-          job = decode_json_items([job]).first
+        item = redis do |conn|
+          item = conn.zrangebyscore(key, '-inf', timestamp.to_s, limit: [0, 1]).first
+          decode_json_items([item]).first
         end
 
-        return 0 unless job
+        return timestamp - item.body['timestamp'].to_f if item
 
-        now_timestamp - job['timestamp'].to_f
+        0
       end
 
       def redis
