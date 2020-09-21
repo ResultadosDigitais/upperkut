@@ -11,6 +11,7 @@ module Upperkut
 
     def process
       items = @worker.fetch_items.freeze
+      return unless items.any?
 
       @worker.server_middlewares.invoke(@worker, items) do
         @worker_instance.perform(items)

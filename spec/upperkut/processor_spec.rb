@@ -49,6 +49,16 @@ module Upperkut
         ])
       end
 
+      context 'when there is no items to process' do
+        before do
+          allow(worker).to receive(:fetch_items).and_return([])
+        end
+
+        it 'does not call the worker' do
+          expect(worker).not_to receive(:perform)
+        end
+      end
+
       context 'when something goes wrong while fetching items' do
         let(:logger) { spy('logger') }
 
