@@ -58,7 +58,7 @@ module Upperkut
 
     def self.default
       new.tap do |config|
-        config.polling_interval = Integer(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
+        config.polling_interval = Float(ENV['UPPERKUT_POLLING_INTERVAL'] || 5)
       end
     end
 
