@@ -4,6 +4,16 @@ module Upperkut
   RSpec.describe Util do
     include Upperkut::Util
 
+    describe '#to_underscore' do
+      it 'transforms strings into their underscored version' do
+        expect(to_underscore("Upperkut::BufferedQueue")).to eq('upperkut_buffered_queue')
+      end
+
+      it 'transforms frozen strings into their underscored version properly' do
+        expect(to_underscore(Upperkut::Util.name)).to eq('upperkut_util')
+      end
+    end
+
     describe '#normalize_items' do
       it 'transforms hashes into items' do
         items_hash = [{ 'my_property' => 1 }]
