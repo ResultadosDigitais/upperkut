@@ -4,6 +4,7 @@ metadata:
   name: upperkut
   description: Ferramenta de processamento em segundo plano para Ruby.
   annotations:
+    circleci.com/project-slug: github/ResultadosDigitais/upperkut
     github.com/project-slug: ResultadosDigitais/upperkut
   links:
     - url: <https://opensource.resultadosdigitais.com.br/>
