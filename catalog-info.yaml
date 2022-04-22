@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: upperkut
+  description: Ferramenta de processamento em segundo plano para Ruby.
+  annotations:
+    github.com/project-slug: ResultadosDigitais/upperkut
+  links:
+    - url: <https://opensource.resultadosdigitais.com.br/>
+      title: Projetos open source da RD.
+spec:
+  type: service
+  owner: devtools
+  lifecycle: production
