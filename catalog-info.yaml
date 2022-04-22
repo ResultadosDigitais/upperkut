@@ -10,6 +10,6 @@ metadata:
     - url: <https://opensource.resultadosdigitais.com.br/>
       title: Projetos open source da RD.
 spec:
-  type: service
+  type: library
   owner: devtools
   lifecycle: production
