@@ -7,7 +7,7 @@ metadata:
     circleci.com/project-slug: github/ResultadosDigitais/upperkut
     github.com/project-slug: ResultadosDigitais/upperkut
   links:
-    - url: <https://opensource.resultadosdigitais.com.br/>
+    - url: https://opensource.resultadosdigitais.com.br/
       title: Projetos open source da RD.
 spec:
   type: library
