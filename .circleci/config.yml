@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/ruby: 3.2
+      - image: cimg/ruby:3.2
         environment:
           CC_TEST_REPORTER_ID: 03ab83a772148a577d29d4acf438d7ebdc95c632224122d0ba8dbb291eedebe6
           COVERAGE: true
